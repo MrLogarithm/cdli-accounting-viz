@@ -14,10 +14,11 @@ from convert.number_system import *
 #########################
 # Begin list of number systems:
 #
-Ordinal = NumberSystem(
-    "ordinal",
+Cardinal = NumberSystem(
+    "cardinal",
     {
         # NUMERALS
+        "asz":1,
         "disz": 1,
         "u":    10,
         "gesz2": 60,
@@ -36,6 +37,7 @@ Ordinal = NumberSystem(
 Length = NumberSystem(
     "length",
     {
+        "asz": 1, # TODO verify
     # NUMERALS
     "disz": 1,
     "u":    10,
@@ -46,12 +48,12 @@ Length = NumberSystem(
     "szargal": 216000,
     # UNITS
     "szu-si":1./180, # 1/30 of kusz3
-    "|SZU.BAD|": 1./12, # 1/2 of kusz3
+    "|szu.bad|": 1./12, # 1/2 of kusz3
     "kusz3": 1./6,
     "gi": 1,
     "ninda":2,
     "esz2":20, # 10 times ninda
-    "USZ":120,# 6 times esz2
+    "usz":120,# 6 times esz2
     "danna":3600,# 30 times USZ
     },
     "gi",
@@ -61,6 +63,7 @@ Length = NumberSystem(
 Surface = NumberSystem(
     "surface",
     {
+        "asz": 1, # TODO verify
         # NUMERALS without GAN2
         "disz": 1,
         "u":    10,
@@ -76,16 +79,16 @@ Surface = NumberSystem(
         "esze3":6, # 6 times 1(iku) GAN2
         "bur3":18, # 3 times 1(esze) GAN2
         "bur'u":180, # 10 times 1(bur3) GAN2
-        ("szar2","GAN2"): 6480000, # 6 times 1(bur'u) GAN2
-        ("szar'u","GAN2"): 64800000, # 10 times szar2
-        ("szargal","GAN2"): 388800000, # 60 szar2
+        ("szar2","gan2"): 6480000, # 6 times 1(bur'u) GAN2
+        ("szar'u","gan2"): 64800000, # 10 times szar2
+        ("szargal","gan2"): 388800000, # 60 szar2
         # UNITS
         "sze":1./180,
         "gin2 tur":1./60,
         "gin2":1,
         "ma-na tur":1./3,
         "sar":60,
-        "GAN2":6000,
+        "gan2":6000,
     },
     "gin2",
     "m^2",
@@ -94,6 +97,7 @@ Surface = NumberSystem(
 Volume = NumberSystem(
     "volume",
     {
+        "asz":1, # TODO verify
         "disz": 1,
         "u":    10,
         "gesz2": 60,
@@ -158,6 +162,7 @@ DryCapacity = NumberSystem(
 LiquidCapacity = NumberSystem(
     "liquid capacity",
     {
+        "asz":1, # TODO verify
         "disz": 1, # UNIT #
         "u":    10,
         "gesz2": 60,
@@ -186,7 +191,7 @@ Weight = NumberSystem(
         "szar2": 3600,
         "szar'u": 36000,
         "szargal": 216000,
-        ("|NINDA2x(SZE.1(ASZ))|",None):1, # TODO test
+        ("|ninda2x(sze.1(asz))|",None):1, # TODO test
         #
         "sze":1./180,
         "gin2":1,
@@ -200,6 +205,7 @@ Weight = NumberSystem(
 Brick = NumberSystem(
     "bricks",
     {
+        "asz":1, # TODO verify
         "disz": 1, # UNIT #
         "u":    10,
         "gesz2": 60,
@@ -216,7 +222,7 @@ Brick = NumberSystem(
     12)
 
 num_systems = set([
-    Ordinal,
+    Cardinal,
     Length,
     Surface,
     Volume, 
@@ -262,6 +268,8 @@ def convert( num, sign_vals=None ):
     describes the number "1(disz) gin2" which, according to the "weight" system of notation, is equivalent to 1 Sumerian gin2, or 8.33... modern grams.
     """
 
+    num = normalize( num )
+
     if sign_vals is None:
         result = []
         for system in num_systems:
@@ -304,6 +312,16 @@ def convert( num, sign_vals=None ):
     last_sign_was_modifier = False
 
     for sign in digits[::-1]:
+
+        if sign == "..." or sign == "x":
+            return [{
+                "system": "unknown",
+                "unit": "",
+                "value": "none",
+                "modern_unit": "",
+                "modern_value": "none",
+                "query": num,
+            }]
 
         if not last_sign_was_modifier:
             last_modifier = modifier

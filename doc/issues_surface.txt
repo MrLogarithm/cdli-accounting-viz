@@ -1,0 +1,85 @@
+# List of examples of surface notations 
+# which may be problematic:
+
+GAN2-bi vs GAN2
+
+la2: subtraction
+https://cdli-gh.github.io/guides/lists.html
+u4 1(u) la2 1(disz)-kam "the 9th day" (the 10-1th day)
+also possible as la2-a in this usage
+
+######
+2(asz) lu{sar} 2(asz) szum2 sikil : 2(asz) sar 1(asz) : sig15 1(asz) kas ge6
+   2(asz) lu{sar} = 2x turnips
+   2(asz) szum sikil = 2x garlic (pure? or "garlic plants"?)
+** 2(asz) sar = ??? 2x gardens? sar occurs in Volume, Brick, and Surface. Not apprently modifying 1(asz) sig15. Following examples also have garlic plants counted in front: is this counting 2 fields worth of vegetation?
+   1(asz) sig15 = 1 bread(?) ; ePSD mostly has zi3 sig15 'good flour', in any case does not seem to be numeric
+
+2(asz) lu{sar} 2(asz) szum2 sikil : 2(asz) sar 2(asz) : ku6 dar-ra 1(asz) ku6
+2(asz) lu{sar} 2(asz) szum2 sikil : 2(asz) sar 2(asz) : ku6 dar-ra 1(asz) ku6
+1(asz) lu{sar} 1(asz) szum2 sikil : 1(asz) sar : 5(disz)-sze3 1(disz) ur-utu 1(disz)
+2(asz) szum2 sikil 1(asz) lu{sar} : 1(asz) sar : sze sa sanga e2-babbar2
+
+######
+1(asz) lu{sar} 1(asz) szum2 sikil : 1(asz) sar : 5(disz)-sze3 1(disz) ur-utu 1(disz)
+** 5(disz)-sze3 = sze3 is probably terminative case marker?
+
+######
+absin3 1(u) 2(asz) gan2 3(u) : 5(asz) sar : szum2 gu4 3(disz) gar
+** 5(asz) sar probably continues an area measurement with gan2
+   -> implies asz should function like disz for areas?
+   absin3 "furrow" and szumgu probably "onion", so an area planted with onions
+
+######
+sikil gal-gal absin3 5(asz) gan2 : 1(u) 3(disz) sar 2(asz) : 4(ban2) tu-szum2 sikil absin3-bi
+** again, asz in an area measurement, for some furrows of aliums
+
+######
+: 4(u) 6(asz) sar : gu4 1(u) 4(asz) si4-lum{sar}
+** again, sar occurs in Volume, Brick, and Surface. Here a number of fields of oxen?
+
+######
+2(asz) sar szum2 sa6 disz-su3 : 1(disz)-am6 7(asz) sar : gu4 6(asz) sar szum2
+la2 igi 6(disz)-gal2 masz ki-duru5 : 5(asz)-am6 2(iku) 1/4(iku) : i3-diri gan2 apin-la2 gan2
+** -am6 ???
+
+######
+More unusual surface measures:
+
+szum2 sa6 sa6-ga 1(u) la2 : 1(asz) sar : gu4 nu-sa6-ga pa5 1(disz)-am6
+absin3 1(u) la2 1(asz) gan2 : 2(u) 2(asz) sar : szum2-ma gan2 du5-uh2 gan2
+gur saggal absin3 2(u) gan2 : 4(u) sar 4(asz) : 1(ban2) tu-szum2 sikil absin3-bi
+1(disz) gan2 4(u) la2 2(disz) : 1/2(disz) sar 1(asz) : 2(ban2) szum2 sa6 absin3-bi
+5(disz)-am6 gan2 1(iku) gan2 la2 : 5(disz) sar 3(asz) : szum2 sikil absin3 4(u)
+6(asz) gan2 1(iku) gan2 la2 : 3(disz) sar 1(asz) : 4(ban2) tu-szum2 sikil absin3-bi
+gu4-sar absin3 2(u) 1(asz) gan2 : 1/2(iku) 2(asz) : szum2 dilmun mu5-ru5 szum2
+gu2-gu2 gu4 absin3 4(asz) gan2 : 1(u) sar 3(asz) : 4(ban2) szum2 sikil gal-gal
+szum2 dilmun absin3 2(asz) gan2 : 5(disz) sar 1(asz) : szum2 gu4-sar 1(disz) gar
+igi 3(disz)-gal2 sar ab-ba-ab-ba szu-nigin2 : 5(asz) sar : gin2 1(u) kin e2
+absin3 2(u) 4(asz) gan2 1/2(iku) : 1(u) sar 1(asz) : 1(ban2) szum2 gu4 2(disz)
+absin3 2(u) 5(asz) gan2 1/2(iku) : 1/8(iku) 2(asz) : tu-szum2 sikil absin3 5(u)
+absin3 2(u) la2 3(asz) gan2 : 1/2(iku) 1(asz) : 4(ban2) szum2 gu4 3(disz)
+gu2-gu2 gu4 absin3 4(asz) gan2 : 1(u) sar 3(asz) : 4(ban2) szum2 sikil gal-gal
+szum2 dilmun absin3 2(asz) gan2 : 5(disz) sar 1(asz) : szum2 gu4-sar 1(disz) gar
+sze sa 3(u) sa si4-lum : 3(u) sar 1(asz) : lu{sar} sanga e2-babbar2 3(asz)
+
+
+######
+2(disz)-kam uru-ka-gi-na lugal lagasz{ki} 6(|aszxdisz|) : 2/3(asz){sza} sar : amar-ezem ensi2 gal ur-du6
+la2 1(disz) gi us2-sa2 e2 : 2/3(asz){sza} sar :
+
+
+mu5-ru5-ta 3(asz) absin3 gu2-gu2 gan2 : 1(u) sar 1(asz) : szum2 sa6 absin3 4(u)
+sze-lu2 5(asz) absin3 gu2-gu2 gan2 : 2(u) sar 1(asz) : sikil gal-gal absin3 1(u)
+1(disz) gar absin3 8(disz) gan2 : 2(u) sar 2(asz) : gu2-gu2 2(asz) absin3 sze-lu2
+pa sa la2-a {gesz}gul-bu gan2 : 1/4(iku) 1/8(iku) iku 2(u) 1(asz) : ha-zi 2(u) gesz usan3
+1(asz) lu{sar} 1(asz) szum2 sikil : 1(asz) sar : ... 1(asz) ninda ka-gu7
+1(asz) lu{sar} 1(asz) szum2 sikil : 1(asz) sar : 6(disz)-sze3 ma-ma nin-me-du10-ga e2-bara2
+sze gu4 gu7 2(u) la2 : 2(asz) 1(bur3) : ku5-ra2 sze gu4 gu7-bi
+4(asz) ni-gi4-ma ur-abzu 3(u) la2 : 1(asz) sar : ur-pu2 nu-kiri6 nam-dumu 1(u)
+ni-gi4-ma 3(u) sar ga:esz8{sar} ur-e2-dam : 2(u) 2(asz) sar : amar-ezem szesz amar-szuba3 1(u)
+mu5-ru5-ta 3(asz) absin3 gu2-gu2 gan2 : 1(u) sar 1(asz) : szum2 sa6 gur saggal
+sze-lu2 5(asz) absin3 gu2-gu2 gan2 : 2(u) sar 1(asz) : sikil-gal-gal absin3 1(u) 2(disz)
+1(disz) gar absin3 8(disz) gan2 : 2(u) sar 2(asz) : gu2-gu2 2(asz) absin3 sze-lu2
+: 7(asz) sar : sig 7(asz) sar szum2
+7(asz) sar gu sig : 7(asz) sar : gaz sig 1(gesz2) sar
