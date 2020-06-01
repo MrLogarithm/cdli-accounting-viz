@@ -14,6 +14,16 @@ from convert.number_system import *
 #########################
 # Begin list of number systems:
 #
+Date = NumberSystem(
+    "date",
+    {
+        # NUMERALS
+        "|aszxdisz|":1,
+        # UNITS
+    },
+    "",
+    "", # years?
+    1)
 Cardinal = NumberSystem(
     "cardinal",
     {
@@ -222,6 +232,7 @@ Brick = NumberSystem(
     12)
 
 num_systems = set([
+    Date,
     Cardinal,
     Length,
     Surface,

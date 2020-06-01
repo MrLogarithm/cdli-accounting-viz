@@ -18,13 +18,19 @@ Script to extract counted objects ("commodities") from a transliterated text. Th
 
 
 ## Notes & To-Do
-- Confirm: asz can be used as a cardinal, as in *2(asz) ku6 dar-ra*?
-- Confirm: tablet-final \|ASZxDISZ\| records the year the document was inscribed?
-- Add option to toggle greedy handling of *...* and *x* when detecting numerals
+**Numerals**
+- Edzard 2003:66 gives szargesz (|SZAR2xGESZ2| or |SZAR2xU|-gunu) as alternate for szar-gal. Does this occur in our corpus?
 - (asz){sza}, as in *2/3(asz){sza} sar* 
-- If we fetch details from the ePSD, note that some sign names differ between the CDLI corpus and the ePSD (e.g. ePSD has *zid2* where CDLI has *zi3*, but these are apparently [the same sign](http://etcsl.orinst.ox.ac.uk/edition2/signlist.php)).
 - Handle discontinuities: *4(asz) siki ma-na* records *4(asz) ma-na* (~2kg) of *siki* (wool), not *4(asz) siki* of *ma-na*.
 - Handle subtraction: *u4 1(u) la2 1(disz)-kam* "the 9th day" written as "the 10 - 1th day"
 - Surface measures seem to have more variability than other notations. See `doc/issues_surface.txt` for problem cases.
+
+**Commodity Id**
+- If we fetch details from the ePSD, note that some sign names differ between the CDLI corpus and the ePSD (e.g. ePSD has *zid2* where CDLI has *zi3*, but these are apparently [the same sign](http://etcsl.orinst.ox.ac.uk/edition2/signlist.php)).
 - *{gisz}...* and *{gisz}x* etc are not commodities
 - Check morphology: are e.g. *{gisz}RU* and *{gisz}RU-ur-ka* the same thing?
+
+**Done**
+- ~~Confirm: asz can be used as a cardinal, as in *2(asz) ku6 dar-ra*?~~
+- ~~Confirm: tablet-final \|ASZxDISZ\| records the year the document was inscribed?~~
+- ~~Add option to toggle greedy handling of *...* and *x* when detecting numerals~~
