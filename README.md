@@ -26,3 +26,5 @@ Script to extract counted objects ("commodities") from a transliterated text. Th
 - Handle discontinuities: *4(asz) siki ma-na* records *4(asz) ma-na* (~2kg) of *siki* (wool), not *4(asz) siki* of *ma-na*.
 - Handle subtraction: *u4 1(u) la2 1(disz)-kam* "the 9th day" written as "the 10 - 1th day"
 - Surface measures seem to have more variability than other notations. See `doc/issues_surface.txt` for problem cases.
+- *{gisz}...* and *{gisz}x* etc are not commodities
+- Check morphology: are e.g. *{gisz}RU* and *{gisz}RU-ur-ka* the same thing?
