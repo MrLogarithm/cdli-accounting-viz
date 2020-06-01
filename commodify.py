@@ -4,6 +4,8 @@ import data
 import numpy as np
 import re
 from fuzzywuzzy import fuzz
+from collections import defaultdict
+from recordclass import make_dataclass
 
 # Load dictionary for use in making annotations:
 dictionary = np.load( "dict/epsd.npz", allow_pickle=True )["dictionary"].item()
@@ -58,6 +60,19 @@ commodity_determinatives = set([
         "u2",       # plant
         ])
 
+Entry = make_dataclass("Entry",
+        [
+            ("count",list),
+            ("words",list)
+        ], defaults=[
+            None,
+            []
+        ]) 
+def new_entry():
+    entry = Entry()
+    entry.words = []
+    return entry
+
 ############################################
 # Process each text and annotate the words
 # which are likely to represent counted objects:
@@ -72,21 +87,23 @@ for text in data.girsu:
     text = list(map(substitute,text))
 
     entries = []
-    entry = []
+    entry = new_entry()
     for word, counts in segment.segment( text ):
         # TODO Idea: limit to the first n words after the digit?
         # Later information tends to represent recipients,
         # festivals, explanations, etc. 
         if word == "x" or word == "...":
-            entry += [word]
+            entry.words += [word]
             #print( word, end=' ' )
             continue
 
         if counts is not None and len(counts) > 0:
             #print()
             #print( word, end=' ' )
+            # This is a numeral:
             entries.append( entry )
-            entry = [word]
+            entry = new_entry()
+            entry.count = (word,counts)
             continue
 
         # If a word contains one of the commodity determinatives,
@@ -99,11 +116,11 @@ for text in data.girsu:
 
             # For now just use CLAWS-style _COM tag:
             #print( "%s_COM"%(word), end=' ' )
-            entry += ["%s_COM"%(word)]
+            entry.words += ["%s_COM"%(word)]
             pass
 
         else:
-            entry += [word]
+            entry.words += [word]
             # We can use fuzzy string matching to identify known 
             # words with extra morphology attached, but this is
             # slow and low-precision. Ideally we want proper automated
@@ -121,11 +138,48 @@ for text in data.girsu:
                 #pass
 
     entries.append( entry )
-    entries = [ entry for entry in entries if entry != []]
+    entries = [ entry for entry in entries if not (entry.count is None and entry.words == [])]
     commodified_texts.append( entries )
 
+# *_COM -> num string -> number of occurrences
+counts_by_commodity = defaultdict(lambda:defaultdict(int))
+# (*_COM, *_COM) -> number of cooccurrences
+collocation_counts = defaultdict(int)
 if __name__ == "__main__":
     for entries in commodified_texts:
         if len(entries) > 5 and len(entries) < 50:
-            print('\n'.join([' '.join(entry) for entry in entries]))
-            print()
+            for entry in entries:
+                
+                if entry.count is not None:
+                    count, values = entry.count
+                else:
+                    count = "" # Is this the best way to handle lines with no count? TODO
+
+                for word in entry.words:
+                    if word.endswith("_COM"):
+                        word = word.replace( "_COM", "" )
+                        counts_by_commodity[ word ][ count ] += 1
+            for i in range(len(entries)):
+                for j in range(i+1,len(entries)):
+                    for word_i in entries[i].words:
+                        if not word_i.endswith( "_COM" ):
+                            continue
+                        for word_j in entries[j].words:
+                            if not word_j.endswith( "_COM" ):
+                                continue
+                            # dict can only store tuple values
+                            # for consistency, sort the keys
+                            # and provide and accessor that 
+                            # sorts queries likewise
+                            key = tuple(sorted([
+                                word_i.replace("_COM",""), 
+                                word_j.replace("_COM","")]))
+                            collocation_counts[ word_i, word_j ] += 1
+    all_objects = counts_by_commodity.keys()
+    # TODO Some refinements needed: {gesz}... is not a commodity; is {gesz}RU the same as {gesz}RU-ur-ka minus morphology?
+                #print(count,
+                        #"\t",
+                        #[word for word in words if word.endswith("_COM")]
+                        #)
+            #print('\n'.join([' '.join(words) for (count, words) in entries]))
+            #print()

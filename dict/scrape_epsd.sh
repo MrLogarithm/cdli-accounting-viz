@@ -3,6 +3,7 @@ IFS='
 
 if [ ! -d epsd ]; then
   mkdir epsd
+  mkdir epsd/forms
 fi
 
 url_base="http://psd.museum.upenn.edu/epsd/cf-toc-"
