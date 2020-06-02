@@ -1,3 +1,4 @@
+import json
 import segment
 import convert
 import data
@@ -143,6 +144,9 @@ for text in data.girsu:
 
 # *_COM -> num string -> number of occurrences
 counts_by_commodity = defaultdict(lambda:defaultdict(int))
+# *_COM -> [values]
+values_by_commodity = defaultdict(list)
+
 # (*_COM, *_COM) -> number of cooccurrences
 collocation_counts = defaultdict(int)
 if __name__ == "__main__":
@@ -153,12 +157,26 @@ if __name__ == "__main__":
                 if entry.count is not None:
                     count, values = entry.count
                 else:
-                    count = "" # Is this the best way to handle lines with no count? TODO
+                    count, values = "", []
 
                 for word in entry.words:
                     if word.endswith("_COM"):
+                        # Don't count broken commodities 
+                        # like ...{ku6}:
+                        if '...' in word:
+                            continue
+                        # TODO How to handle unreadable counts? 
+                        # Probably count every instance of the commodity,
+                        # so that people can accurately say such-and-such
+                        # occurs N times in the corpus, but omit "none"
+                        # from the list of values? 
                         word = word.replace( "_COM", "" )
                         counts_by_commodity[ word ][ count ] += 1
+                        # TODO How do we want to resolve ambiguous values?
+                        # As baseline, just pick the first possible value:
+                        if values != []:
+                            values_by_commodity[ word ].append( values )
+
             for i in range(len(entries)):
                 for j in range(i+1,len(entries)):
                     for word_i in entries[i].words:
@@ -176,10 +194,11 @@ if __name__ == "__main__":
                                 word_j.replace("_COM","")]))
                             collocation_counts[ word_i, word_j ] += 1
     all_objects = counts_by_commodity.keys()
-    # TODO Some refinements needed: {gesz}... is not a commodity; is {gesz}RU the same as {gesz}RU-ur-ka minus morphology?
-                #print(count,
-                        #"\t",
-                        #[word for word in words if word.endswith("_COM")]
-                        #)
-            #print('\n'.join([' '.join(words) for (count, words) in entries]))
-            #print()
+
+    output_json = {
+            "counts_by_commodity": dict(counts_by_commodity),
+            "values_by_commodity": dict(values_by_commodity),
+            "all_objects": list(all_objects),
+        }
+
+    # TODO Some refinements needed: is {gesz}RU the same as {gesz}RU-ur-ka minus morphology?

@@ -4,6 +4,8 @@ Utilities and visualizations for CDLI accounting corpora. *Confer* https://cdli-
 #### convert/
 Module for converting numbers from cuneiform and cuneiform-adjacent scripts into arabic numerals. Currently supports proto-Elamite and ED IIIb Sumerian. `convert_flask.py` contains the skeleton of a Flask API for querying this module.
 
+`python -m convert.test_convert_sumerian` to run the tests.
+
 #### dict/
 Module which sets up a simple Sumerian-English dictionary derived from the [ePSD](http://psd.museum.upenn.edu/nepsd-frame.html). Where possible, dictionary items are annotated with a POS tag projected from the English definition. **This is a rudimentary proof-of-concept** which will eventually be replaced by a proper Sumerian POS tagger. Please do not use this module unless you are willing to manually verify its output and make corrections.
 
@@ -29,6 +31,7 @@ Script to extract counted objects ("commodities") from a transliterated text. Th
 - If we fetch details from the ePSD, note that some sign names differ between the CDLI corpus and the ePSD (e.g. ePSD has *zid2* where CDLI has *zi3*, but these are apparently [the same sign](http://etcsl.orinst.ox.ac.uk/edition2/signlist.php)).
 - *{gisz}...* and *{gisz}x* etc are not commodities
 - Check morphology: are e.g. *{gisz}RU* and *{gisz}RU-ur-ka* the same thing?
+- Do *1(aš@c) apin anše* and *2(aš@c) anše apin* both refer to plow-horses/donkeys/equids, or is one a plow-horse and the other a horse-drawn plow?
 
 **Done**
 - ~~Confirm: asz can be used as a cardinal, as in *2(asz) ku6 dar-ra*?~~
