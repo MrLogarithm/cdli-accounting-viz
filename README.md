@@ -28,12 +28,6 @@ Script to extract counted objects ("commodities") from a transliterated text. Th
 - Surface measures seem to have more variability than other notations. See `doc/issues_surface.txt` for problem cases. [#4](https://github.com/MrLogarithm/cdli-accounting-viz/issues/4)
 
 **Commodity Id**
-- If we fetch details from the ePSD, note that some sign names differ between the CDLI corpus and the ePSD (e.g. ePSD has *zid2* where CDLI has *zi3*, but these are apparently [the same sign](http://etcsl.orinst.ox.ac.uk/edition2/signlist.php)).
-- *{gisz}...* and *{gisz}x* etc are not commodities
-- Check morphology: are e.g. *{gisz}RU* and *{gisz}RU-ur-ka* the same thing?
-- Do *1(aš@c) apin anše* and *2(aš@c) anše apin* both refer to plow-horses/donkeys/equids, or is one a plow-horse and the other a horse-drawn plow?
-
-**Done**
-- ~~Confirm: asz can be used as a cardinal, as in *2(asz) ku6 dar-ra*?~~
-- ~~Confirm: tablet-final \|ASZxDISZ\| records the year the document was inscribed?~~
-- ~~Add option to toggle greedy handling of *...* and *x* when detecting numerals~~
+- If we fetch details from the ePSD, note that some sign names differ between the CDLI corpus and the ePSD (e.g. ePSD has *zid2* where CDLI has *zi3*, but these are apparently [the same sign](http://etcsl.orinst.ox.ac.uk/edition2/signlist.php)). [#9](https://github.com/MrLogarithm/cdli-accounting-viz/issues/9)
+- Check morphology: are e.g. *{gisz}RU* and *{gisz}RU-ur-ka* the same thing? [#7](https://github.com/MrLogarithm/cdli-accounting-viz/issues/7)
+- Do *1(aš@c) apin anše* and *2(aš@c) anše apin* both refer to plow-horses/donkeys/equids, or is one a plow-horse and the other a horse-drawn plow? [#8](https://github.com/MrLogarithm/cdli-accounting-viz/issues/8)
