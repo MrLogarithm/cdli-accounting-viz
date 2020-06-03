@@ -13,7 +13,7 @@ for letter in {A,B,D,E,G,NG,H,I,K,L,M,N,P,R,S,SH,T,U,W,Y,Z}; do
   if [ -f epsd/cf-toc-$letter.html ]; then
     rm epsd/cf-toc-$letter.html
   fi
-  wget -P epsd/ ${url_base}${letter}.html
+  wget -q -P epsd/ ${url_base}${letter}.html
   for line in $( cat epsd/cf-toc-${letter}.html |grep "showarticle\|popxff" ); do
     # Some sed distros don't support extended regex, so for
     # compatibility reasons we don't use (showarticle|popxff)
@@ -23,7 +23,7 @@ for letter in {A,B,D,E,G,NG,H,I,K,L,M,N,P,R,S,SH,T,U,W,Y,Z}; do
     else
       num=$( echo $line |sed "s/^.*showarticle('\([^']*\).html').*$/\1/g" )
     fi
-    echo Fetch details for $num:
-    wget -P epsd/forms ${url_forms}${num} -O epsd/forms/$num
+    echo Fetch details for $num
+    wget -q -P epsd/forms ${url_forms}${num} -O epsd/forms/$num
   done
 done
