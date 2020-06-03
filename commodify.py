@@ -78,8 +78,7 @@ def new_entry():
 # Process each text and annotate the words
 # which are likely to represent counted objects:
 #
-commodified_texts = []
-for text in data.girsu:
+def commodify( text ):
 
     # Standardize notation: asz@c -> asz, ASZxDISZ@t -> ASZxDISZ, etc
     # These represent curved/flat/rotated/variant sign forms
@@ -140,16 +139,20 @@ for text in data.girsu:
 
     entries.append( entry )
     entries = [ entry for entry in entries if not (entry.count is None and entry.words == [])]
-    commodified_texts.append( entries )
+    return entries
 
-# *_COM -> num string -> number of occurrences
-counts_by_commodity = defaultdict(lambda:defaultdict(int))
-# *_COM -> [values]
-values_by_commodity = defaultdict(list)
-
-# (*_COM, *_COM) -> number of cooccurrences
-collocation_counts = defaultdict(int)
 if __name__ == "__main__":
+    # *_COM -> num string -> number of occurrences
+    counts_by_commodity = defaultdict(lambda:defaultdict(int))
+    # *_COM -> [values]
+    values_by_commodity = defaultdict(list)
+    # (*_COM, *_COM) -> number of cooccurrences
+    collocation_counts = defaultdict(int)
+
+    commodified_texts = []
+    for text in data.girsu:
+        commodified_texts.append( commodify( text ) )
+
     for entries in commodified_texts:
         if len(entries) > 5 and len(entries) < 50:
             for entry in entries:
