@@ -63,7 +63,7 @@ commodity_determinatives = set([
 
 Entry = make_dataclass("Entry",
         [
-            ("count",list),
+            ("count",dict),
             ("words",list)
         ], defaults=[
             None,
@@ -103,7 +103,7 @@ def commodify( text ):
             # This is a numeral:
             entries.append( entry )
             entry = new_entry()
-            entry.count = (word,counts)
+            entry.count = {"string":word,"readings":counts}
             continue
 
         # If a word contains one of the commodity determinatives,
@@ -158,7 +158,8 @@ if __name__ == "__main__":
             for entry in entries:
                 
                 if entry.count is not None:
-                    count, values = entry.count
+                    count = entry.count["string"]
+                    values = entry.count["readings"]
                 else:
                     count, values = "", []
 

@@ -1,10 +1,23 @@
 #!flask/bin/python
 from flask import Flask, jsonify, request, abort, make_response
+from flask_swagger_ui import get_swaggerui_blueprint
 from commodify import *
 from convert import *
 import data
 
 app = Flask(__name__)
+
+SWAGGER_URL = '/docs' 
+API_URL = 'https://cdli-numerals.herokuapp.com/swagger.json'
+
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={ 
+        'app_name': "CDLI Numeral Conversion"
+    },
+)
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 @app.route('/canparse', methods=['POST'])
 def canparse_post():
@@ -27,10 +40,11 @@ def canparse_post():
         greedy = request.json['greedy']
 
     if request.json['language'] == "sux":
-        response = {system.name:system.canParse( 
+        results = {system.name:system.canParse( 
             request.json['query'], 
             greedy
         ) for system in convert.convert_sumerian.num_systems}
+        response = {"result":[{"system":system,"canparse":results[system]} for system in results]}
 
 
     # To be supported in future release:
@@ -43,7 +57,7 @@ def canparse_post():
                         %(request.json['language'])}
                     ), 400)
 
-    return jsonify( response ), 201
+    return jsonify( response ), 200
         
 @app.route('/convert', methods=['POST'])
 def convert_post():
@@ -84,7 +98,7 @@ def convert_post():
                         %(request.json['language'])}
                     ), 400)
 
-    return jsonify( response ), 201
+    return jsonify( response ), 200
 
 @app.route('/commodify', methods=['POST'])
 def commodify_post():
@@ -112,7 +126,13 @@ def commodify_post():
     response = {"entries": [
         {field:entry.__getattribute__(field) for field in entry.__fields__} for entry in response
         ]}
-    return jsonify( response ), 201
+    return jsonify( response ), 200
+
+@app.route('/spec.json', methods=['GET'])
+def spec_get():
+    return make_response(jsonify({
+            
+        }), 200)
 
 @app.errorhandler(404)
 def not_found(error):
