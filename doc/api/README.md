@@ -36,23 +36,23 @@ Each item in the list of readings is a JSON object with the following fields:
 Query:
 ```json
 {
-  'query': '1(u) sar',
-  'language': 'sux',
-  'system':, 'surface'
+  "query": "1(u) sar",
+  "language": "sux",
+  "system":, "surface"
 }
 ```
 
 Reponse:
 ```json
 {
-  'readings': [
+  "readings": [
     {
-      'modern_unit': 'm^2',
-      'modern_value': 360,
-      'query': '1(u) sar',
-      'system': 'surface',
-      'unit': 'gin2',
-      'value': 600
+      "modern_unit": "m^2",
+      "modern_value": 360,
+      "query": "1(u) sar",
+      "system": "surface",
+      "unit": "gin2",
+      "value": 600
     }
   ]
 }
@@ -93,9 +93,9 @@ A JSON object with the following fields:
 Query:
 ```json
 {
-  'query':, '1(iku) GAN2 1(u) sar',
-  'language': 'sux',
-  'greedy': false
+  "query":, "1(iku) GAN2 1(u) sar",
+  "language": "sux",
+  "greedy": false
 }
 ```
 
@@ -150,7 +150,7 @@ Each item in the list of entries is a JSON object with the following fields:
 Query:
 ```json
 {
-  'text':, '2(u) {gesz}ildag4 sir2-sir2-ra 6(asz@c) {gesz}giparx(KISAL)'
+  "text":, "2(u) {gesz}ildag4 sir2-sir2-ra 6(asz@c) {gesz}giparx(KISAL)"
 }
 ```
 
