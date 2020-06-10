@@ -4,6 +4,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from commodify import *
 from convert import *
 import data
+import json
 
 app = Flask(__name__)
 
@@ -128,11 +129,12 @@ def commodify_post():
         ]}
     return jsonify( response ), 200
 
-@app.route('/spec.json', methods=['GET'])
+@app.route('/swagger.json', methods=['GET'])
 def spec_get():
-    return make_response(jsonify({
-            
-        }), 200)
+    json_f = open( "swagger.json" )
+    json_s = json.load( json_f )
+    json_f.close()
+    return make_response( json_s, 200 )
 
 @app.errorhandler(404)
 def not_found(error):
