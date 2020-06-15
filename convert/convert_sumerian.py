@@ -73,7 +73,7 @@ Length = NumberSystem(
 Surface = NumberSystem(
     "surface",
     {
-        "asz": 1, # TODO verify
+        "asz": 1,
         # NUMERALS without GAN2
         "disz": 1,
         "u":    10,
@@ -148,7 +148,12 @@ DryCapacity = NumberSystem(
         # in expectation of an eventual 1(asz). but we don't incorporate the value
         # of gur into 1(ban2), so we divide by 1 gur to counteract 
         "ban2@v":10 / 300, 
+        #("asz", "gur"):1,
         "barig":60 / 300, # 6 ban2
+        #("barig", None):60 / 300,
+        #("barig", "gur"):60 / 300,
+        #("barig", "sila3"):60 / 300,
+
         #("ban2",None):10, # 10 times sila3
         #("ban2@v",None):10, 
         #("barig",None):60, # 6 ban2
@@ -312,6 +317,7 @@ def convert( num, sign_vals=None ):
     # e.g. in 2(iku) the unit is iku
     unit = None
     last_unit = None
+    negated = False
     
 
     # Value of the number
@@ -339,9 +345,12 @@ def convert( num, sign_vals=None ):
 
         # if sign does not start with [0-9]( or igi-[0-9](
         # then it is a modifier:
-        if not re.match( "^(igi-)?[0-9/]+\(", sign ):
-            modifier = sign
-            last_sign_was_modifier = True
+        if not re.match( r"^(igi-)?[0-9/]+\(", sign ):
+            if sign == "la2":
+                negated = True
+            else:
+                modifier = sign
+                last_sign_was_modifier = True
 
         else:
             last_count = count
@@ -378,8 +387,16 @@ def convert( num, sign_vals=None ):
 
             # Get sign value for this number system and multiply
             # by the number of signs there are:
+            if negated:
+                count *= -1
             value += sign_vals[ unit, modifier ] * count
             last_sign_was_modifier = False
+    
+    # We give la2 a value of -1, which causes the final
+    # return value to be the negative when la2 occurs. 
+    # Invert it to get the right value:
+    if value < 0:
+        value = -1*value
 
     return [{
             "system": sign_vals.name, 

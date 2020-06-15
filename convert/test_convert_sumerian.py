@@ -1,5 +1,16 @@
 from convert.convert_sumerian import *
 
+def test_sumerian_subtraction():
+    subtraction_tests = [
+        ("1(disz) sila3 la2 1(u) 4(disz) gin2", DryCapacity, 0.7666666666666666),
+        ("1(disz) 1/3(disz) gin2 la2 6(disz) sze", Weight, 1.3),
+        ("1(disz) 1/3(disz) gin2 la2 6(disz) sze", DryCapacity, 0.021666666666666667),
+        ("2/3(disz) ma-na 3(disz) gin2 la2 6(disz) sze", Weight, 42.96666666666667),
+        ("1(u) 9(disz) gin2 la2 1(u) 4(disz) 1/2(disz) sze", DryCapacity, 0.31532407407407403),
+        ("2/3(disz) sar la2 1(disz) gin2", Surface, 39.0),
+    ]
+    for test, system, expected in subtraction_tests:
+        assert np.isclose(convert(test, system)[0]["value"], expected)
 
 def test_sumerian_cardinal():
     cardinal_tests = [
@@ -68,8 +79,9 @@ def test_sumerian_drycapacity():
         (
             "1(gesz2) 2(u) 1(asz) 2(barig) 3(ban2) 2(disz) 1/2(disz) sila3 sze gur",
             DryCapacity,
-            24452.5,
+            24452.5, # TODO
         ),
+        #("1(asz) 4(barig) 5(ban2) gur", DryCapacity, 291), # TODO
     ]
     for test, system, expected in drycapacity_tests:
         assert np.isclose(convert(test, system)[0]["value"], expected)

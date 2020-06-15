@@ -25,7 +25,7 @@ class NumberSystem( object ):
                     # ordinal
                     return False # TODO special output for ordinals? e.g. append "th"? Should mark somehow so translation knows there might be additional morphology on this token
                 sign = sign[ sign.index("(") + 1 : len(sign) - 1 - sign[::-1].index(")") ]
-            if sign not in self.possible_signs: 
+            if sign not in self.possible_signs and sign != "la2": 
                 if greedy and (sign == "..." or sign == "x"):
                     continue
                 #print(sign,"not in",self.name)
@@ -70,6 +70,7 @@ class NumberSystem( object ):
 
 def normalize( string ):
     string = string.lower()
+    string = re.sub( "[\[\]]", "", string )
     string = re.sub( "@[a-z]", "", string )
     string = re.sub( "-bi ", " ", string )
     string = re.sub( "gesz'u", "geszu", string )

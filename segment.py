@@ -44,6 +44,11 @@ def segment( text, greedy=True ):
                     for system in convert.convert_sumerian.num_systems ]):
                     length += 1
 
+                    # In cases like 1(iku) gan2 1(asz) gur, enforce a break
+                    # after gan2:
+                    if text[i+length-1].lower() == "gan2":
+                        break
+
                 # If we can't parse the string as a number, we must have
                 # reached the end of the numeral string:
                 else:
