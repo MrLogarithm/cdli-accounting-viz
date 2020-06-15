@@ -4,13 +4,14 @@ Utilities and visualizations for CDLI accounting corpora. *Confer* https://cdli-
 #### convert/
 Module for converting numbers from cuneiform and cuneiform-adjacent scripts into arabic numerals. Currently supports proto-Elamite and ED IIIb Sumerian. `convert_flask.py` contains the skeleton of a Flask API for querying this module.
 
-`python -m convert.test_convert_sumerian` to run the tests.
-
 #### dict/
 Module which sets up a simple Sumerian-English dictionary derived from the [ePSD](http://psd.museum.upenn.edu/nepsd-frame.html). Where possible, dictionary items are annotated with a POS tag projected from the English definition. **This is a rudimentary proof-of-concept** which will eventually be replaced by a proper Sumerian POS tagger. Please do not use this module unless you are willing to manually verify its output and make corrections.
 
 #### doc/
 Additional documentation and notes.
+
+#### util/
+Scripts and helper functions. Not part of the main project, but used for data analysis and to check coverage of existing tools.
 
 #### segment.py
 Script to detect and parse the numbers in a transliterated text. The result is a text which has been segmented into "entries" delimited by numbers. 
@@ -22,9 +23,8 @@ Script to extract counted objects ("commodities") from a transliterated text. Th
 ## Notes & To-Do
 **Numerals**
 - Edzard 2003:66 gives szargesz (|SZAR2xGESZ2| or |SZAR2xU|-gunu) as alternate for szar-gal. Does this occur in our corpus? [#1](https://github.com/MrLogarithm/cdli-accounting-viz/issues/1)
-- (asz){sza}, as in *2/3(asz){sza} sar* [#2](https://github.com/MrLogarithm/cdli-accounting-viz/issues/2)
+ (asz){sza}, as in *2/3(asz){sza} sar* [#2](https://github.com/MrLogarithm/cdli-accounting-viz/issues/2)
 - Handle discontinuities: *4(asz) siki ma-na* records *4(asz) ma-na* (~2kg) of *siki* (wool), not *4(asz) siki* of *ma-na*. [#3](https://github.com/MrLogarithm/cdli-accounting-viz/issues/3)
-- Handle subtraction: *u4 1(u) la2 1(disz)-kam* "the 9th day" written as "the 10 - 1th day" [#5](https://github.com/MrLogarithm/cdli-accounting-viz/issues/5)
 - Surface measures seem to have more variability than other notations. See `doc/issues_surface.txt` for problem cases. [#4](https://github.com/MrLogarithm/cdli-accounting-viz/issues/4)
 
 **Commodity Id**

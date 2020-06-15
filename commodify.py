@@ -1,6 +1,7 @@
 import json
 import segment
 import convert
+import semantic
 import data
 import numpy as np
 import re
@@ -14,10 +15,9 @@ dictionary = np.load( "dict/epsd.npz", allow_pickle=True )["dictionary"].item()
 # TODO Manually emending sign readings will
 # increase accuracy for identification of
 # some commodities. Will require a sound list
-# of equivalences. There is a possible list
-# at http://etcsl.orinst.ox.ac.uk/edition2/signlist.php
-# but we should contact Steve Tinney of the
-# ePSD for permissions to use.
+# of equivalences: perhaps based on the list
+# from the Nuolenna project?
+# https://github.com/tosaja/Nuolenna/blob/master/sign_list.txt
 # 
 # For now, just map zi3 -> zid2 as proof of concept:
 sign_substitutions = {"zi3":"zid2"}
@@ -36,7 +36,8 @@ commodity_determinatives = set([
         "urudu",    #metal
         "tug2",     # cloth
         "ku6",      # fish
-        #"sza:gan", # TODO pig, or a kind of pot/jar? both seem commodity-like
+        #"sza:gan", # TODO pig, or a kind of pot/jar? 
+                    # both seem commodity-like
         "szagan",   # ^ same
         "sza",      # ^ same
         "gan",      # ^ same
@@ -44,9 +45,12 @@ commodity_determinatives = set([
         "zid2",     # grains
         "zi3",      # grains, alternate name for zid2
         "sar",      # plant
-        #"ninda",   # TODO should be bread? or pole? ePSD not clear. cf nindaxDU 
-        #"munus",   # TODO woman. likely more indicative of a name? check how precise this rule is
-        #"da",      # TODO only occurs in banda3{da}, looking like a phonetic complement more than a determinative
+        #"ninda",   # Usage seems restricted to {ninda}nindax(DU) 
+                    # where it appears to be a length measurement.
+        #"munus",   # TODO woman. likely more indicative of a name? 
+                    # check how precise this rule is
+        #"da",      # TODO only occurs in banda3{da}, looking like 
+                    # a phonetic complement more than a determinative
         #"sza",     # TODO only with (asz){sza}
         "muszen",   # bird 
         #"gada",    # TODO meaning?
@@ -54,8 +58,10 @@ commodity_determinatives = set([
         "dug",      # pottery
         #"ga2",     # TODO meaning?
         #"an",      # TODO meaning?
-        #"ur3", # TODO only in dur9{ur3} "donkey". Looks again like phonetic complement. Are these animals being counted in the text?
-        "ha",       # tree? Looks like phonetic complement which is only used (in Girsu texts) for {ha}har-ra-na
+        #"ur3", # TODO only in dur9{ur3} "donkey". Looks again like 
+                    # phonetic complement. 
+        "ha",       # tree? Looks like phonetic complement which is 
+                    # only used (in Girsu texts) for {ha}har-ra-na
         "na4",      # stones
         "gu4",      # cattle
         "u2",       # plant
@@ -69,6 +75,7 @@ Entry = make_dataclass("Entry",
             None,
             []
         ]) 
+
 def new_entry():
     entry = Entry()
     entry.words = []
@@ -88,10 +95,18 @@ def commodify( text ):
 
     entries = []
     entry = new_entry()
+
+    # Record distance from the preceding number: 
+    # most commodities occur within 3 tokens of the
+    # numeral
+    dist_from_numeral = 0
+    # Have we found a commodity in this entry yet?
+    found_com = False
+    
     for word, counts in segment.segment( text ):
-        # TODO Idea: limit to the first n words after the digit?
-        # Later information tends to represent recipients,
-        # festivals, explanations, etc. 
+
+        dist_from_numeral += 1
+
         if word == "x" or word == "...":
             entry.words += [word]
             #print( word, end=' ' )
@@ -104,6 +119,8 @@ def commodify( text ):
             entries.append( entry )
             entry = new_entry()
             entry.count = {"string":word,"readings":counts}
+            dist_from_numeral = 0
+            found_com = False
             continue
 
         # If a word contains one of the commodity determinatives,
@@ -111,14 +128,35 @@ def commodify( text ):
         # mark it as a commodity.
         #
         # TODO Focus refinements on this part of the script:
-        if any( "{%s}"%(det) in word for det in commodity_determinatives ):
+        is_counted = False
+        if dist_from_numeral <= 3:
+            if any( "{%s}"%(det) in word for det in commodity_determinatives ):
                 #or any(defn[1] == "NN" for defn in dictionary[word]) \
+                is_counted = True
+            elif word in dictionary:
+                for defn, POS in dictionary[word]:
+                    defn = defn.replace("?","")
+                    is_com, evidence = semantic.is_commodity_synset( 
+                            word, 
+                            semantic.get_hypernyms( defn )
+                        )
+                    if is_com:
+                        if found_com:
+                            # skip some adjectives:
+                            # TODO instead of doing this, refactor to jointly classify all words in the entry. Score all and use context to interpret.
+                            pass
+                        is_counted = True
+                        break
+                    elif not is_com and evidence != []:
+                        is_counted = False
+                        break
+                    
 
+        if is_counted:
             # For now just use CLAWS-style _COM tag:
             #print( "%s_COM"%(word), end=' ' )
             entry.words += ["%s_COM"%(word)]
-            pass
-
+            found_com = True
         else:
             entry.words += [word]
             # We can use fuzzy string matching to identify known 
@@ -152,6 +190,9 @@ if __name__ == "__main__":
     commodified_texts = []
     for text in data.girsu:
         commodified_texts.append( commodify( text ) )
+
+    print(commodified_texts[0])
+    exit()
 
     for entries in commodified_texts:
         if len(entries) > 5 and len(entries) < 50:
@@ -204,5 +245,6 @@ if __name__ == "__main__":
             "values_by_commodity": dict(values_by_commodity),
             "all_objects": list(all_objects),
         }
+    print(output_json)
 
     # TODO Some refinements needed: is {gesz}RU the same as {gesz}RU-ur-ka minus morphology?
