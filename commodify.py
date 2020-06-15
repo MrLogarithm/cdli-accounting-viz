@@ -1,3 +1,4 @@
+from nltk.corpus import wordnet as wn
 import json
 import segment
 import convert
@@ -81,6 +82,59 @@ def new_entry():
     entry.words = []
     return entry
 
+def com_label( words ):
+    if words == []:
+        return words 
+
+    features = [[] for _ in words]
+    for i,word in enumerate(words):
+
+        # DETERMINATIVES
+        if any( "{%s}"%(det) in word for det in commodity_determinatives ):
+            #or any(defn[1] == "NN" for defn in dictionary[word]) \
+            features[i].append( 1 )
+        else:
+            features[i].append( 0 )
+
+        features[i].append(0)
+        FEAT_COM = 1
+        FEAT_PERS = 2
+        FEAT_ADJ = 3
+        if word in dictionary:
+            for defn, POS in dictionary[word]:
+                defn = defn.replace("?","")
+                is_com, evidence = semantic.is_commodity_synset( 
+                        word, 
+                        semantic.get_hypernyms( defn )
+                    )
+                if is_com:
+                    features[i][-1] = FEAT_COM
+                    break
+                elif not is_com and evidence != []:
+                    if evidence == "person":
+                        features[i][-1] = FEAT_PERS
+                    elif evidence == "adj":
+                        features[i][-1] = FEAT_ADJ
+                    elif isinstance( evidence, list ) and type( evidence[0] ).__name__ == "Synset":
+                        features[i][-1] = -1
+                        #if any( "person." in str(e) for e in evidence ):
+                            # implicit ration?
+                    else:
+                        features[i][-1] = -1
+                    break
+
+    for i in range(len(words)):
+        if features[i][0] == 1:
+            words[i] += "_COM"
+        elif features[i][1] == FEAT_COM:
+            words[i] += "_COM"
+        elif features[i][1] == FEAT_ADJ:
+            # $mun$
+            if len(words) == 1:
+                words[i] += "_COM"
+
+    return words
+
 ############################################
 # Process each text and annotate the words
 # which are likely to represent counted objects:
@@ -112,10 +166,9 @@ def commodify( text ):
             #print( word, end=' ' )
             continue
 
-        if counts is not None and len(counts) > 0:
-            #print()
-            #print( word, end=' ' )
-            # This is a numeral:
+        elif counts is not None and len(counts) > 0:
+            # This is a numeral (boundary between items)
+            entry.words = com_label( entry.words )
             entries.append( entry )
             entry = new_entry()
             entry.count = {"string":word,"readings":counts}
@@ -123,58 +176,11 @@ def commodify( text ):
             found_com = False
             continue
 
-        # If a word contains one of the commodity determinatives,
-        # (or it's tagged as a noun,)
-        # mark it as a commodity.
-        #
-        # TODO Focus refinements on this part of the script:
-        is_counted = False
-        if dist_from_numeral <= 3:
-            if any( "{%s}"%(det) in word for det in commodity_determinatives ):
-                #or any(defn[1] == "NN" for defn in dictionary[word]) \
-                is_counted = True
-            elif word in dictionary:
-                for defn, POS in dictionary[word]:
-                    defn = defn.replace("?","")
-                    is_com, evidence = semantic.is_commodity_synset( 
-                            word, 
-                            semantic.get_hypernyms( defn )
-                        )
-                    if is_com:
-                        if found_com:
-                            # skip some adjectives:
-                            # TODO instead of doing this, refactor to jointly classify all words in the entry. Score all and use context to interpret.
-                            pass
-                        is_counted = True
-                        break
-                    elif not is_com and evidence != []:
-                        is_counted = False
-                        break
-                    
-
-        if is_counted:
-            # For now just use CLAWS-style _COM tag:
-            #print( "%s_COM"%(word), end=' ' )
-            entry.words += ["%s_COM"%(word)]
-            found_com = True
         else:
             entry.words += [word]
-            # We can use fuzzy string matching to identify known 
-            # words with extra morphology attached, but this is
-            # slow and low-precision. Ideally we want proper automated
-            # stemming/morphological parsing.
-            #if dictionary[word] == set():
-                #print(word, [
-                    #key for key in dictionary 
-                    #if key != word 
-                    #and fuzz.ratio(word,key) > 90
-                    #])
-                #print( "%s"%(word), end=' ' )
-                #pass
-            #else:
-                #print( "%s"%(word), end=' ' )
-                #pass
-
+        
+    # Tag and append the final entry:
+    entry.words = com_label( entry.words )
     entries.append( entry )
     entries = [ entry for entry in entries if not (entry.count is None and entry.words == [])]
     return entries
@@ -190,9 +196,6 @@ if __name__ == "__main__":
     commodified_texts = []
     for text in data.girsu:
         commodified_texts.append( commodify( text ) )
-
-    print(commodified_texts[0])
-    exit()
 
     for entries in commodified_texts:
         if len(entries) > 5 and len(entries) < 50:

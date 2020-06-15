@@ -45,25 +45,25 @@ def is_commodity_synset( word, synsets ):
             # TODO kusz3 Unit amount?
             "{ninda}nindax(DU)", # apparently another spelling for ninda
         ]
-    blacklist_words = [
-            "lugal", # king
-            "geme2", # worker (human, not animal)
-            "sa", # bundle TODO this implies the following word is a commodity, often eg turnips
+    blacklist_words = {
+            "lugal":"person", # king
+            "geme2":"person", # worker (human, not animal)
+            "sa":"bundle", # bundle TODO this implies the following word is a commodity, often eg turnips
             # TODO dag "pot" also implies following is commodity, but sometimes occurs on its own
             # TODO sa2-du11 "offering" implies following is com
             # TODO nig2-du3-a "string" of fruit, following word
             # todo munus-me person - ration?
-            "ge6", # black - missing from dictionary
-            "x",
-            "babbar2", # white
-            "sag", # TODO many meanings - some disambiguation? #
-            "dar-ra", # split - adjective modifier
-            "za-na", # TODO meaning?
-            "gu-la2", # large/gal TODO a unit? word order is wrong for it to be "large garlic" in gu-la2 szum2 szuh5-ha
-            "u4", # days - these are the object being counted but are they relevant?
-            "mun", # TODO blacklist only when no other object
-            "dub-sar", # scribe, the person not the implement
-        ]
+            "ge6":"adj", # black - missing from dictionary
+            "x":"",
+            "babbar2":"adj", # white
+            "sag":"", # TODO many meanings - some disambiguation? #
+            "dar-ra":"adj", # split - adjective modifier
+            "za-na":"", # TODO meaning?
+            "gu-la2":"adj", # large/gal TODO a unit? word order is wrong for it to be "large garlic" in gu-la2 szum2 szuh5-ha
+            "u4":"date", # days - these are the object being counted but are they relevant?
+            "mun":"adj", # TODO blacklist only when no other object
+            "dub-sar":"person", # scribe, the person not the implement
+        }
     whitelist_words = [
             "kas", # often written in place of kasz "beer"
             #"dam", # TODO spouse, but sometimes looks like a female slave?
@@ -101,7 +101,7 @@ def is_commodity_synset( word, synsets ):
         return False, ["UNIT"]
 
     if word in blacklist_words:
-        return False, ["BLACKLIST"]
+        return False, blacklist_words[word] #["BLACKLIST"]
 
     if word in whitelist_words:
         return True, ["WHITELIST"]
