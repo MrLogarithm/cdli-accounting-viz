@@ -42,10 +42,15 @@ def segment( text, greedy=True ):
                 # If we can parse the string as a number, keep going:
                 if any([ system.canParse( string ) 
                     for system in convert.convert_sumerian.num_systems ]):
-                    length += 1
 
+                    # In e.g. 1(disz)-kam 1(u) gu2, break after -kam
+                    if "-kam" in string:
+                        break
+
+                    length += 1
+                    
                     # In cases like 1(iku) gan2 1(asz) gur, enforce a break
-                    # after gan2:
+                    # after gan2.
                     if text[i+length-1].lower() == "gan2":
                         break
 

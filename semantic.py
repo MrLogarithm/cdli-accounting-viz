@@ -46,6 +46,9 @@ def is_commodity_synset( word, synsets ):
             "{ninda}nindax(DU)", # apparently another spelling for ninda
         ]
     blacklist_words = {
+            "ba":"",# allot, precedes a name, usually after a field area
+            "murgu2":"adj",# shoulder/spine of fruit
+            "a2":"",#"half-day's labor"
             "lugal":"person", # king
             "geme2":"person", # worker (human, not animal)
             "sa":"bundle", # bundle TODO this implies the following word is a commodity, often eg turnips
@@ -61,14 +64,26 @@ def is_commodity_synset( word, synsets ):
             "za-na":"", # TODO meaning?
             "gu-la2":"adj", # large/gal TODO a unit? word order is wrong for it to be "large garlic" in gu-la2 szum2 szuh5-ha
             "u4":"date", # days - these are the object being counted but are they relevant?
+            "mu":"date",#year
             "mun":"adj", # TODO blacklist only when no other object
             "dub-sar":"person", # scribe, the person not the implement
+            "ba-ug7-ge":"",
+            "si-i3-tum":"", #remainder
+            "a-ra2":"", #times, as in a-ra2 1(disz)-kam the first time
+            "na":"adj", #stone, used for denoting means of measurement
+            "li":"adj",#oil, as in udu nita li
+            "nim":"adj",#fly?
+            "nita":"adj",#male, animal
+            "nita-me":"person",#male, person?
+            "giri3":"",#through, from, via
+            "nu-siki":"adj",
+            "igi-nu-du8":"person", # blind 
+            "us2-sa":"",
         }
     whitelist_words = [
             "kas", # often written in place of kasz "beer"
             #"dam", # TODO spouse, but sometimes looks like a female slave?
             "gu4", # cattle
-            #"igi-nu-du8", # blind - counted as objects, or recipients of rations?
             # nu-siki orphan - orphaned animals or people?
             # nita-me male - person?
             # en-ku3 - person - implied ration?
@@ -76,6 +91,9 @@ def is_commodity_synset( word, synsets ):
             "ga'ar", # cheese
             "szuku", # ration
             "ud5", # goat
+            "SZIM", # aromatic/perfume
+            "szim",
+            "sze",
         ]
     blacklist_syns = [
             "person."
@@ -87,6 +105,7 @@ def is_commodity_synset( word, synsets ):
             'material.', 
             'animal.', 
             'tool.', 
+            "metal", 
             "stone.", 
             "rock.", 
             'tree.', 
@@ -95,7 +114,8 @@ def is_commodity_synset( word, synsets ):
             'skin.', 
             'hair.', 
             'musical_instrument.', 
-            'wood.'
+            'wood.',
+            'vessel.'
         ]
     if word in units:
         return False, ["UNIT"]
@@ -106,71 +126,17 @@ def is_commodity_synset( word, synsets ):
     if word in whitelist_words:
         return True, ["WHITELIST"]
 
+    if synsets is None:
+        return False, []
+
     matches = [ synset for synset in synsets if any(term in str(synset) for term in whitelist_syns) ]
     bad_matches = [ synset for synset in synsets if any(term in str(synset) for term in blacklist_syns) ]
+
+    #if word == "ku3-bi":
+        #print(word,synsets, matches, bad_matches)
+    
     if matches != []:
         return True, matches
     if bad_matches != []:
         return False, bad_matches
     return False, []
-
-"""
-com_instances = 0
-num_coms = 0
-num_det = 0
-
-num_neg = 0
-neg_inst = 0
-
-import sys
-for word in sys.stdin:
-    try:
-        #count, word=word.lower().strip().split(" ")
-        count, word=word.strip().split(" ")
-    except:
-        continue
-    if word in dictionary:
-        is_com = False
-        is_neg = False
-        defs = list(dictionary[word])
-        for def_,pos in defs:
-            def_ = def_.replace("?","")
-            com, syns = is_commodity_synset( word, get_hypernyms(def_) )
-            print((" "*31)+"\t{0} {1}".format(def_,pos,))
-            print((" "*31)+"\t{0}".format(
-                  (com, syns)
-                ))
-            if com:
-                is_com = True
-            elif syns != []:
-                is_neg = True
-        print()
-        print("{0:5} {1:25} {2}".format(count, word, is_com))
-        if is_com:
-            #print(word,"is com")
-            if "{" in word:
-                num_det += 1
-                print("*"*100)
-            num_coms += 1
-            com_instances += int(count)
-        elif is_neg:
-            num_neg += 1
-            neg_inst += int(count)
-    else:
-        print(word,"not in dictionary")
-        pass
-        #print(dictionary[word] if word in dictionary else word)
-
-            #if dictionary[word] == set():
-                #print(word, [
-                    #key for key in dictionary 
-                    #if key != word 
-                    #and fuzz.ratio(word,key) > 90
-                    #])
-                #print( "%s"%(word), end=' ' )
-                #pass
-            #else:
-                #print( "%s"%(word), end=' ' )
-                #pass
-print("found", num_coms, 'non det:', num_coms - num_det, "instances:",com_instances,"not com",num_neg,'neg inst',neg_inst)
-"""

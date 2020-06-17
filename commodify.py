@@ -21,11 +21,24 @@ dictionary = np.load( "dict/epsd.npz", allow_pickle=True )["dictionary"].item()
 # https://github.com/tosaja/Nuolenna/blob/master/sign_list.txt
 # 
 # For now, just map zi3 -> zid2 as proof of concept:
-sign_substitutions = {"zi3":"zid2"}
+sign_substitutions = {
+        "zid2":"zi3",
+        "kug":"ku3",
+        "ku3":"kug",
+        "ERIN2":"ERIM",
+        }
 def substitute( sign ):
     if sign in sign_substitutions:
-        return sign_substitutions[ sign ]
-    return sign
+        yield sign_substitutions[ sign ]
+        return
+    else:
+        for s in sign_substitutions:
+            yield re.sub("(^|-)"+s+"(-|$)","\\1"+sign_substitutions[s]+"\\2",sign)
+    return 
+words = list(dictionary.keys())
+for word in words:
+    for sub in substitute( word ):
+        dictionary[ sub ] = dictionary[word]
 
 # Determinatives selected based on ePSD definitions,
 # personal experience, and 
@@ -85,6 +98,19 @@ def new_entry():
 def com_label( words ):
     if words == []:
         return words 
+    # don't label dates:
+    if words[0] in set(["mu", "u4", "iti"]):
+        return words
+    # this is a total : remove to avoid double-counts?
+    if words[0] in set(["szunigin", "gu2-an-sze3", "szu-nigin2"]):
+        words += ["TOTAL"]
+    # donors and explanatory information:
+    #if words[0] in set(["ki", "giri3"]):
+        #return words
+    if "###" not in words:
+        # ?
+        return words
+
 
     features = [[] for _ in words]
     for i,word in enumerate(words):
@@ -116,22 +142,49 @@ def com_label( words ):
                     elif evidence == "adj":
                         features[i][-1] = FEAT_ADJ
                     elif isinstance( evidence, list ) and type( evidence[0] ).__name__ == "Synset":
-                        features[i][-1] = -1
+                        if any( "person" in str(synset) for synset in evidence ):
+                            features[i][-1] = FEAT_PERS
+                        else:
+                            features[i][-1] = -1
                         #if any( "person." in str(e) for e in evidence ):
                             # implicit ration?
                     else:
                         features[i][-1] = -1
                     break
+        else:
+            is_com, evidence = semantic.is_commodity_synset( word, None )
+            if is_com:
+                features[i][-1] = FEAT_COM
 
+
+
+    maybe_ration = False
     for i in range(len(words)):
+        #if not "###" in words[max(0,i-3):i]:
+            #continue
         if features[i][0] == 1:
-            words[i] += "_COM"
+            if i>0 and any( w.endswith("_COM") for w in words[max(0,i-3):i]):
+                pass
+            else:
+                words[i] += "_COM"
         elif features[i][1] == FEAT_COM:
-            words[i] += "_COM"
+            # This check helps avoid labeling modifiers
+            # as commodities: e.g. in zi3 sig15, only
+            # label zi3, as we would in e.g. ku6 dar-ra
+            if i>0 and any( w.endswith("_COM") for w in words[max(0,i-3):i]):
+                pass
+            else:
+                words[i] += "_COM"
         elif features[i][1] == FEAT_ADJ:
             # $mun$
             if len(words) == 1:
                 words[i] += "_COM"
+        elif features[i][1] == FEAT_PERS:
+            #if len(words) == 1:
+            maybe_ration = True
+    if maybe_ration:
+        if not any( "_COM" in w for w in words ):
+            words.append( "implied_ration?" )
 
     return words
 
@@ -140,12 +193,6 @@ def com_label( words ):
 # which are likely to represent counted objects:
 #
 def commodify( text ):
-
-    # Standardize notation: asz@c -> asz, ASZxDISZ@t -> ASZxDISZ, etc
-    # These represent curved/flat/rotated/variant sign forms
-    # but we care about a more granular level of detail
-    text = [ re.sub("@[a-zA-Z]*","",word) for word in text ]
-    text = list(map(substitute,text))
 
     entries = []
     entry = new_entry()
@@ -157,8 +204,33 @@ def commodify( text ):
     # Have we found a commodity in this entry yet?
     found_com = False
     
-    for word, counts in segment.segment( text ):
+    if not isinstance( text, list ):
+        text = [ re.sub("@[a-zA-Z]*","",word) for word in text ]
+        text = segment.segment( text )
+    else:
+        # Standardize notation: asz@c -> asz, ASZxDISZ@t -> ASZxDISZ, etc
+        # These represent curved/flat/rotated/variant sign forms
+        # but we care about a more granular level of detail
+        text = [ [ re.sub("@[a-zA-Z]*","",word) for word in line ] for line in text ]
+        text = [ segment.segment( line ) for line in text ]
 
+    for entry_ in text:
+
+        entry = new_entry()
+
+        for string, counts in entry_:
+            if counts is not None:
+                #entry.words = com_label( entry.words )
+                #entries.append( entry )
+                #entry = new_entry()
+                entry.count = {"string":string, "readings":counts}
+                entry.words.append( "###" )
+            else:
+                entry.words.append( string )
+        entry.words = com_label( entry.words )
+        entries.append( entry )
+
+        """
         dist_from_numeral += 1
 
         if word == "x" or word == "...":
@@ -178,10 +250,11 @@ def commodify( text ):
 
         else:
             entry.words += [word]
+        """
         
     # Tag and append the final entry:
-    entry.words = com_label( entry.words )
-    entries.append( entry )
+    #entry.words = com_label( entry.words )
+    #entries.append( entry )
     entries = [ entry for entry in entries if not (entry.count is None and entry.words == [])]
     return entries
 
@@ -194,9 +267,11 @@ if __name__ == "__main__":
     collocation_counts = defaultdict(int)
 
     commodified_texts = []
-    for text in data.girsu:
+    #for text in data.girsu[:100]: # FIXME
+    for text in data.girsu_lined[:100]: # FIXME
         commodified_texts.append( commodify( text ) )
 
+    """
     for entries in commodified_texts:
         if len(entries) > 5 and len(entries) < 50:
             for entry in entries:
@@ -248,6 +323,23 @@ if __name__ == "__main__":
             "values_by_commodity": dict(values_by_commodity),
             "all_objects": list(all_objects),
         }
-    print(output_json)
+    #print(output_json)
+    """
+    #for i in range(len(commodified_texts)):
+        #if data.lined_names[i] in [
+                #"P142827",
+                ##"P142850",
+                #"P249089",
+                #"P100023",
+                #"P459081",
+                #"P459082",
+                #]:
+            #text = commodified_texts[i]
+    for text in commodified_texts:
+            for entry in text:
+                print(entry.words)
+            print()
+            print("="*50)
+            print()
 
     # TODO Some refinements needed: is {gesz}RU the same as {gesz}RU-ur-ka minus morphology?

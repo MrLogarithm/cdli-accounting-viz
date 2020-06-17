@@ -36,6 +36,15 @@ def test_sumerian_cardinal():
         assert np.isclose(convert(test, system)[0]["value"], expected)
 
 
+def test_sumerian_weight():
+    length_tests = [
+        ("1(u) gu2", Weight, 36000),
+        ("3(asz) gu2", Weight, 3600*3),
+    ]
+    for test, system, expected in length_tests:
+        assert np.isclose(convert(test, system)[0]["value"], expected)
+
+
 def test_sumerian_length():
     length_tests = [
         ("1(gesz2) 2(u) 1(disz) 1/2(disz) ninda", Length, 163),
