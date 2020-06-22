@@ -13,6 +13,9 @@ from recordclass import make_dataclass
 # Load dictionary for use in making annotations:
 dictionary = np.load( "dict/epsd.npz", allow_pickle=True )["dictionary"].item()
 
+##################################################
+# Sign substitutions:
+
 # TODO Manually emending sign readings will
 # increase accuracy for identification of
 # some commodities. Will require a sound list
@@ -20,13 +23,15 @@ dictionary = np.load( "dict/epsd.npz", allow_pickle=True )["dictionary"].item()
 # from the Nuolenna project?
 # https://github.com/tosaja/Nuolenna/blob/master/sign_list.txt
 # 
-# For now, just map zi3 -> zid2 as proof of concept:
+# For now, just map some manually identified cases as
+# proof of concept:
 sign_substitutions = {
         "zid2":"zi3",
         "kug":"ku3",
         "ku3":"kug",
         "ERIN2":"ERIM",
         }
+
 def substitute( sign ):
     if sign in sign_substitutions:
         yield sign_substitutions[ sign ]
@@ -35,30 +40,43 @@ def substitute( sign ):
         for s in sign_substitutions:
             yield re.sub("(^|-)"+s+"(-|$)","\\1"+sign_substitutions[s]+"\\2",sign)
     return 
+
+# Emend the dictionary:
 words = list(dictionary.keys())
 for word in words:
     for sub in substitute( word ):
         dictionary[ sub ] = dictionary[word]
 
+##################################################
+# Determinative rules:
+
 # Determinatives selected based on ePSD definitions,
 # personal experience, and 
 # https://personal.sron.nl/~jheise/signlists/determin.html
 commodity_determinatives = set([
+        "dug",      # pottery
+        "gan",      # pig 
         "gesz",     # wood
         "gisz",     # wood, alternate spelling
         "gi",       #reed
-        "urudu",    #metal
-        "tug2",     # cloth
+        "gu4",      # cattle
+        "ha",       # tree? Looks like phonetic complement which is 
+                    # only used (in Girsu texts) for {ha}har-ra-na
         "ku6",      # fish
-        #"sza:gan", # TODO pig, or a kind of pot/jar? 
-                    # both seem commodity-like
-        "szagan",   # ^ same
-        "sza",      # ^ same
-        "gan",      # ^ same
-        "sze3",     # wood, cf {sze3}szer7 = {gesz}szer7
-        "zid2",     # grains
-        "zi3",      # grains, alternate name for zid2
+        "kusz",     # leather
+        "muszen",   # bird 
+        "na4",      # stones
         "sar",      # plant
+        "sza:gan",  # pig
+        "szagan",   # pig
+        "sza",      # pig 
+        "sze3",     # wood, cf {sze3}szer7 = {gesz}szer7
+        "tug2",     # cloth
+        "u2",       # plant
+        "uruda",    # metal
+        "urudu",    # metal
+        "zi3",      # grains, alternate name for zid2
+        "zid2",     # grains
         #"ninda",   # Usage seems restricted to {ninda}nindax(DU) 
                     # where it appears to be a length measurement.
         #"munus",   # TODO woman. likely more indicative of a name? 
@@ -66,21 +84,14 @@ commodity_determinatives = set([
         #"da",      # TODO only occurs in banda3{da}, looking like 
                     # a phonetic complement more than a determinative
         #"sza",     # TODO only with (asz){sza}
-        "muszen",   # bird 
         #"gada",    # TODO meaning?
-        "kusz",     # leather
-        "dug",      # pottery
         #"ga2",     # TODO meaning?
         #"an",      # TODO meaning?
-        #"ur3", # TODO only in dur9{ur3} "donkey". Looks again like 
+        #"ur3",     # TODO only in dur9{ur3} "donkey". Looks again like 
                     # phonetic complement. 
-        "ha",       # tree? Looks like phonetic complement which is 
-                    # only used (in Girsu texts) for {ha}har-ra-na
-        "na4",      # stones
-        "gu4",      # cattle
-        "u2",       # plant
         ])
 
+# Mutable alternative to namedtuple:
 Entry = make_dataclass("Entry",
         [
             ("count",dict),
@@ -95,93 +106,138 @@ def new_entry():
     entry.words = []
     return entry
 
-def com_label( words ):
+def label_wordlist( words ):
+    """
+    words:      a list of words to label as commodities
+    returns:    the input list, with commodities labeled
+                by _COM, modifiers such as adjectives labeled
+                by _MOD, and vessels labeled as _VES
+    """
     if words == []:
         return words 
-    # don't label dates:
+
+    # Don't label dates:
     if words[0] in set(["mu", "u4", "iti"]):
         return words
-    # this is a total : remove to avoid double-counts?
-    if words[0] in set(["szunigin", "gu2-an-sze3", "szu-nigin2"]):
+
+    # If this line is a total, we should ignore it to avoid double counts
+    # "dur" can also mark a total, or be a counted object
+    if words[0] in set(["szunigin", "gu2-an-sze3", "szu-nigin2"]): 
         words += ["TOTAL"]
-    # donors and explanatory information:
+    # Donors and explanatory information:
     #if words[0] in set(["ki", "giri3"]):
         #return words
+    # If there is no count we assume (perhaps incorrectly)
+    # that nothing is being counted in this line:
     if "###" not in words:
-        # ?
         return words
 
-
+    # Now we annotate words with various features
+    # We will use these features to manually decide
+    # what is a commodity, but moving forward we can
+    # add more features and train a real ML model:
     features = [[] for _ in words]
     for i,word in enumerate(words):
+
+        FEAT_NONE = 0
+        FEAT_COM  = 1
+        FEAT_PERS = 2
+        FEAT_ADJ  = 3
+        FEAT_VES  = 4
 
         # DETERMINATIVES
         if any( "{%s}"%(det) in word for det in commodity_determinatives ):
             #or any(defn[1] == "NN" for defn in dictionary[word]) \
-            features[i].append( 1 )
+            features[i].append( FEAT_COM )
         else:
-            features[i].append( 0 )
+            features[i].append( FEAT_NONE )
 
-        features[i].append(0)
-        FEAT_COM = 1
-        FEAT_PERS = 2
-        FEAT_ADJ = 3
+        # SYNSETS
+        features[i].append( FEAT_NONE )
         if word in dictionary:
+            # Check all definions of the word until one of them
+            # gives us evidence to make a decision:
             for defn, POS in dictionary[word]:
                 defn = defn.replace("?","")
+                # Does this definition represent a commodity?
                 is_com, evidence = semantic.is_commodity_synset( 
                         word, 
-                        semantic.get_hypernyms( defn )
+                        semantic.get_noun_hypernyms( defn )
                     )
                 if is_com:
-                    features[i][-1] = FEAT_COM
+                    if any( "vessel" in str(synset) for synset in evidence):
+                        features[i][-1] = FEAT_VES
+                    else:
+                        features[i][-1] = FEAT_COM
                     break
                 elif not is_com and evidence != []:
                     if evidence == "person":
                         features[i][-1] = FEAT_PERS
-                    elif evidence == "adj":
+                    elif evidence == "vessel":
+                        features[i][-1] = FEAT_VES
+                    elif evidence == "mod":
                         features[i][-1] = FEAT_ADJ
                     elif isinstance( evidence, list ) and type( evidence[0] ).__name__ == "Synset":
                         if any( "person" in str(synset) for synset in evidence ):
                             features[i][-1] = FEAT_PERS
                         else:
                             features[i][-1] = -1
-                        #if any( "person." in str(e) for e in evidence ):
-                            # implicit ration?
                     else:
                         features[i][-1] = -1
                     break
         else:
+            # If word is not in the dictionary, don't pass a list of synsets
             is_com, evidence = semantic.is_commodity_synset( word, None )
             if is_com:
                 features[i][-1] = FEAT_COM
 
 
 
+    # Use the features from the last section to 
+    # label the words in the input list:
     maybe_ration = False
+    # If two commodity-like items occur within this many words
+    # of one another, the second will be labeled as a modifier.
+    # This helps with cases like siki udu, where udu and siki
+    # can both be commodities but udu here acts as a modifier.
+    mod_proximity_threshold = 3
     for i in range(len(words)):
-        #if not "###" in words[max(0,i-3):i]:
-            #continue
-        if features[i][0] == 1:
-            if i>0 and any( w.endswith("_COM") for w in words[max(0,i-3):i]):
-                pass
-            else:
-                words[i] += "_COM"
-        elif features[i][1] == FEAT_COM:
+        context = words[max(0,i-mod_proximity_threshold):i]
+        if features[i][0] == FEAT_COM:
             # This check helps avoid labeling modifiers
             # as commodities: e.g. in zi3 sig15, only
             # label zi3, as we would in e.g. ku6 dar-ra
-            if i>0 and any( w.endswith("_COM") for w in words[max(0,i-3):i]):
-                pass
+            if i>0 and any( "_" in w for w in context ):
+                words[i] += "_MOD"
+            else:
+                words[i] += "_COM"
+        elif features[i][1] == FEAT_VES:
+            words[i] += "_VES"
+        elif features[i][1] == FEAT_COM:
+            if i>0 and any( "_" in w for w in context):
+                words[i] += "_MOD"
             else:
                 words[i] += "_COM"
         elif features[i][1] == FEAT_ADJ:
-            # $mun$
-            if len(words) == 1:
-                words[i] += "_COM"
+            # If this entry only contains one word and that word looks
+            # like an adjective/modifier, we instead count it as a 
+            # commodity: helps with e.g. mun "salt" which usually modifies
+            # a fish (ku6 mun) but can also be counted on its own.
+            if len([w for w in words if w != '###']) == 1 or all([features[i][1]==FEAT_ADJ for i in range(len(words)) if words[i]!='###']):
+                if i>0 and any( "_" in w for w in context):
+                    words[i] += "_MOD"
+                else:
+                    words[i] += "_COM"
+            else:
+                words[i] += "_MOD"
         elif features[i][1] == FEAT_PERS:
-            #if len(words) == 1:
+            # If this is a person, we infer that 
+            # there may be an implicit ration:
             maybe_ration = True
+    # If there is a commodity in the entry, then
+    # the person is probably an owner or recipient.
+    # If there is no commodity, then there is probably
+    # an implicit ration:
     if maybe_ration:
         if not any( "_COM" in w for w in words ):
             words.append( "implied_ration?" )
@@ -220,45 +276,23 @@ def commodify( text ):
 
         for string, counts in entry_:
             if counts is not None:
-                #entry.words = com_label( entry.words )
+                #entry.words = label_wordlist( entry.words )
                 #entries.append( entry )
                 #entry = new_entry()
                 entry.count = {"string":string, "readings":counts}
                 entry.words.append( "###" )
             else:
                 entry.words.append( string )
-        entry.words = com_label( entry.words )
+        entry.words = label_wordlist( entry.words )
         entries.append( entry )
 
-        """
-        dist_from_numeral += 1
-
-        if word == "x" or word == "...":
-            entry.words += [word]
-            #print( word, end=' ' )
-            continue
-
-        elif counts is not None and len(counts) > 0:
-            # This is a numeral (boundary between items)
-            entry.words = com_label( entry.words )
-            entries.append( entry )
-            entry = new_entry()
-            entry.count = {"string":word,"readings":counts}
-            dist_from_numeral = 0
-            found_com = False
-            continue
-
-        else:
-            entry.words += [word]
-        """
-        
     # Tag and append the final entry:
-    #entry.words = com_label( entry.words )
+    #entry.words = label_wordlist( entry.words )
     #entries.append( entry )
     entries = [ entry for entry in entries if not (entry.count is None and entry.words == [])]
     return entries
 
-if __name__ == "__main__":
+def commodify_whole_corpus():
     # *_COM -> num string -> number of occurrences
     counts_by_commodity = defaultdict(lambda:defaultdict(int))
     # *_COM -> [values]
@@ -267,15 +301,16 @@ if __name__ == "__main__":
     collocation_counts = defaultdict(int)
 
     commodified_texts = []
-    #for text in data.girsu[:100]: # FIXME
-    for text in data.girsu_lined[:100]: # FIXME
+    for text in data.girsu_lined:
         commodified_texts.append( commodify( text ) )
 
-    """
     for entries in commodified_texts:
         if len(entries) > 5 and len(entries) < 50:
             for entry in entries:
                 
+                if entry.words.count("###") > 1:
+                    continue
+
                 if entry.count is not None:
                     count = entry.count["string"]
                     values = entry.count["readings"]
@@ -323,23 +358,12 @@ if __name__ == "__main__":
             "values_by_commodity": dict(values_by_commodity),
             "all_objects": list(all_objects),
         }
-    #print(output_json)
-    """
-    #for i in range(len(commodified_texts)):
-        #if data.lined_names[i] in [
-                #"P142827",
-                ##"P142850",
-                #"P249089",
-                #"P100023",
-                #"P459081",
-                #"P459082",
-                #]:
-            #text = commodified_texts[i]
-    for text in commodified_texts:
-            for entry in text:
-                print(entry.words)
-            print()
-            print("="*50)
-            print()
 
-    # TODO Some refinements needed: is {gesz}RU the same as {gesz}RU-ur-ka minus morphology?
+    return output_json
+
+if __name__ == "__main__":
+    output_json = commodify_whole_corpus()
+
+    outfile = open("commodities.json", "w")
+    json.dump( output_json, outfile )
+    outfile.close()
