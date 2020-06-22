@@ -143,13 +143,15 @@ DryCapacity = NumberSystem(
         "sze":1./10800,
         "gin2":1./60,
         "sila3":1,
-        "ban2":10 / 300, # 10 times sila3 # TODO the /300 is a hack to make this work
+        ("ban2", 'gur'):10, # 10 times sila3 # TODO the /300 is a hack to make this work
+        ("ban2", None):10, # 10 times sila3 # TODO the /300 is a hack to make this work
         # when we see 1(ban2) we are out of the sila3 regime, so we advance to gur
         # in expectation of an eventual 1(asz). but we don't incorporate the value
         # of gur into 1(ban2), so we divide by 1 gur to counteract 
         "ban2@v":10 / 300, 
         #("asz", "gur"):1,
-        "barig":60 / 300, # 6 ban2
+        ("barig", "gur"):60, # 6 ban2
+        ("barig", None):60, # 6 ban2
         #("barig", None):60 / 300,
         #("barig", "gur"):60 / 300,
         #("barig", "sila3"):60 / 300,
