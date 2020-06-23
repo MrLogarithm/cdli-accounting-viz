@@ -26,6 +26,7 @@ dictionary = np.load( "dict/epsd.npz", allow_pickle=True )["dictionary"].item()
 # For now, just map some manually identified cases as
 # proof of concept:
 sign_substitutions = {
+        #'sign in the dictionary':'sign in the corpus',
         "zid2":"zi3",
         "kug":"ku3",
         "ku3":"kug",
@@ -38,7 +39,7 @@ def substitute( sign ):
         return
     else:
         for s in sign_substitutions:
-            yield re.sub("(^|-)"+s+"(-|$)","\\1"+sign_substitutions[s]+"\\2",sign)
+            yield re.sub("(^|-|\()"+s+"(-|$|\))","\\1"+sign_substitutions[s]+"\\2",sign)
     return 
 
 # Emend the dictionary:
@@ -94,15 +95,20 @@ commodity_determinatives = set([
 # Mutable alternative to namedtuple:
 Entry = make_dataclass("Entry",
         [
-            ("count",dict),
+            ("counts",list),
             ("words",list)
         ], defaults=[
-            None,
+            [],
             []
         ]) 
 
 def new_entry():
     entry = Entry()
+    # Initialize these as empty lists:
+    # otherwise python makes a shallow
+    # copy and all entries end up sharing
+    # the same list of words:
+    entry.counts = []
     entry.words = []
     return entry
 
@@ -202,6 +208,8 @@ def label_wordlist( words ):
     # can both be commodities but udu here acts as a modifier.
     mod_proximity_threshold = 3
     for i in range(len(words)):
+        if words[0] in set(["ki-la2-bi"]) and words[i] == "na4":
+            continue
         context = words[max(0,i-mod_proximity_threshold):i]
         if features[i][0] == FEAT_COM:
             # This check helps avoid labeling modifiers
@@ -261,14 +269,14 @@ def commodify( text ):
     found_com = False
     
     if not isinstance( text, list ):
-        text = [ re.sub("@[a-zA-Z]*","",word) for word in text ]
+        text = [ re.sub("@[a-zA-Z]*","",word) for word in text.strip().split(" ") ]
         text = segment.segment( text )
     else:
         # Standardize notation: asz@c -> asz, ASZxDISZ@t -> ASZxDISZ, etc
         # These represent curved/flat/rotated/variant sign forms
         # but we care about a more granular level of detail
         text = [ [ re.sub("@[a-zA-Z]*","",word) for word in line ] for line in text ]
-        text = [ segment.segment( line ) for line in text ]
+        text = sum([ segment.segment( line ) for line in text ],[])
 
     for entry_ in text:
 
@@ -279,7 +287,7 @@ def commodify( text ):
                 #entry.words = label_wordlist( entry.words )
                 #entries.append( entry )
                 #entry = new_entry()
-                entry.count = {"string":string, "readings":counts}
+                entry.counts.append( {"string":string, "readings":counts} )
                 entry.words.append( "###" )
             else:
                 entry.words.append( string )
@@ -289,7 +297,7 @@ def commodify( text ):
     # Tag and append the final entry:
     #entry.words = label_wordlist( entry.words )
     #entries.append( entry )
-    entries = [ entry for entry in entries if not (entry.count is None and entry.words == [])]
+    entries = [ entry for entry in entries if not (entry.counts == [] and entry.words == [])]
     return entries
 
 def commodify_whole_corpus():
@@ -303,16 +311,18 @@ def commodify_whole_corpus():
     commodified_texts = []
     for text in data.girsu_lined:
         commodified_texts.append( commodify( text ) )
+        #for e in commodified_texts[-1]:
+            #print(e.words)
 
     for entries in commodified_texts:
         for entry in entries:
                 
-            if entry.words.count("###") > 1:
-                continue
+            #if entry.words.count("###") > 1:
+                #continue
 
-            if entry.count is not None:
-                count = entry.count["string"]
-                values = entry.count["readings"]
+            if entry.counts != []:
+                count = entry.counts[0]["string"]
+                values = entry.counts[0]["readings"]
             else:
                 count, values = "", []
 

@@ -143,6 +143,7 @@ def is_commodity_synset( word, synsets ):
     whitelist_syns = [
             "implement.", 
             'tool.', 
+            'gear.n.04',
             'musical_instrument.', 
 
             'food.', 
@@ -150,6 +151,7 @@ def is_commodity_synset( word, synsets ):
 
             'material.', 
             'clothing.', 
+            'fabric.',
 
             "metal", 
             "stone.", 
