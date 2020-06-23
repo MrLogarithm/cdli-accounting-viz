@@ -114,13 +114,15 @@ def commodify_post():
             return make_response(
                 jsonify({'error': 'Please specify \'cdli_no\' or \'text\', not both.'}), 
                 400)
-        text = data.get_by_CDLI_no( request.json['cdli_no'] )
+        text = ' '.join( data.get_by_CDLI_no( request.json['cdli_no'] ) )
     elif 'text' in request.json:
         text = data.clean( request.json['text'] )
+        text = ' '.join(text)
     else:
         return make_response(
             jsonify({'error': 'Missing parameter \'cdli_no\' or \'text\'.'}), 
             400)
+    print(text)
 
     # convert to tuple so that objects are serializable:
     response = commodify( text )
