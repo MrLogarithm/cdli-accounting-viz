@@ -4,7 +4,11 @@ try:
     nltk.find('corpora/wordnet')
 except LookupError:
     nltk.download('wordnet')
-from nltk.corpus import wordnet as wn
+try:
+    from nltk.corpus import wordnet as wn
+except:
+    nltk.download('wordnet', force=True)
+    from nltk.corpus import wordnet as wn
 
 import json
 import segment
