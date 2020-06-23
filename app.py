@@ -132,7 +132,7 @@ def commodify_post():
     return jsonify( response ), 200
 
 @app.route('/commodities.json', methods=['GET'])
-def spec_get():
+def coms_get():
     json_f = open( "commodities.json" )
     json_s = json.load( json_f )
     json_f.close()
