@@ -131,6 +131,13 @@ def commodify_post():
         ]}
     return jsonify( response ), 200
 
+@app.route('/commodities.json', methods=['GET'])
+def spec_get():
+    json_f = open( "commodities.json" )
+    json_s = json.load( json_f )
+    json_f.close()
+    return make_response( json_s, 200 )
+
 @app.route('/swagger.json', methods=['GET'])
 def spec_get():
     json_f = open( "swagger.json" )
