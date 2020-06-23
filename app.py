@@ -1,12 +1,20 @@
 #!flask/bin/python
 from flask import Flask, jsonify, request, abort, make_response
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask_caching import Cache
 from commodify import *
 from convert import *
 import data
 import json
 
+config = {
+        "CACHE_TYPE": "simple",
+        "CACHE_DEFAULT_TIMEOUT": 3600,
+    }
+
 app = Flask(__name__)
+app.config.from_mapping( config )
+cache = Cache( app )
 
 SWAGGER_URL = '/docs' 
 API_URL = 'https://cdli-numerals.herokuapp.com/swagger.json'
@@ -132,6 +140,8 @@ def commodify_post():
     return jsonify( response ), 200
 
 @app.route('/commodities.json', methods=['GET'])
+@cache.cached(timeout=60*60*24) # Cache timeout of 1 day, 
+# because the data doesn't change often
 def coms_get():
     json_f = open( "commodities.json" )
     json_s = json.load( json_f )
