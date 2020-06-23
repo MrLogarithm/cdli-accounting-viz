@@ -1,4 +1,9 @@
 #!/bin/python
+import nltk
+try:
+    nltk.find('corpora/wordnet')
+except LookupError:
+    nltk.download('wordnet')
 from nltk.corpus import wordnet as wn
 
 import json

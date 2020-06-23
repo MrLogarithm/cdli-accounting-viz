@@ -1,4 +1,3 @@
-from nltk.corpus import wordnet as wn
 import json
 import segment
 import convert
