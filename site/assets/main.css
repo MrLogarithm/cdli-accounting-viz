@@ -1677,27 +1677,27 @@ a.close.disabled { pointer-events: none; }
 
 .bs-tooltip-top .arrow, .bs-tooltip-auto[x-placement^="top"] .arrow { bottom: 0; }
 
-.bs-tooltip-top .arrow::before, .bs-tooltip-auto[x-placement^="top"] .arrow::before { top: 0; border-width: 0.4rem 0.4rem 0; border-top-color: #000; }
+.bs-tooltip-top .arrow::before, .bs-tooltip-auto[x-placement^="top"] .arrow::before { top: 0; border-width: 0.4rem 0.4rem 0; border-top-color: rgba(0, 0, 0, 0.7); }
 
 .bs-tooltip-right, .bs-tooltip-auto[x-placement^="right"] { padding: 0 0.4rem; }
 
 .bs-tooltip-right .arrow, .bs-tooltip-auto[x-placement^="right"] .arrow { left: 0; width: 0.4rem; height: 0.8rem; }
 
-.bs-tooltip-right .arrow::before, .bs-tooltip-auto[x-placement^="right"] .arrow::before { right: 0; border-width: 0.4rem 0.4rem 0.4rem 0; border-right-color: #000; }
+.bs-tooltip-right .arrow::before, .bs-tooltip-auto[x-placement^="right"] .arrow::before { right: 0; border-width: 0.4rem 0.4rem 0.4rem 0; border-right-color: rgba(0, 0, 0, 0.7); }
 
 .bs-tooltip-bottom, .bs-tooltip-auto[x-placement^="bottom"] { padding: 0.4rem 0; }
 
 .bs-tooltip-bottom .arrow, .bs-tooltip-auto[x-placement^="bottom"] .arrow { top: 0; }
 
-.bs-tooltip-bottom .arrow::before, .bs-tooltip-auto[x-placement^="bottom"] .arrow::before { bottom: 0; border-width: 0 0.4rem 0.4rem; border-bottom-color: #000; }
+.bs-tooltip-bottom .arrow::before, .bs-tooltip-auto[x-placement^="bottom"] .arrow::before { bottom: 0; border-width: 0 0.4rem 0.4rem; border-bottom-color: rgba(0, 0, 0, 0.7); }
 
 .bs-tooltip-left, .bs-tooltip-auto[x-placement^="left"] { padding: 0 0.4rem; }
 
 .bs-tooltip-left .arrow, .bs-tooltip-auto[x-placement^="left"] .arrow { right: 0; width: 0.4rem; height: 0.8rem; }
 
-.bs-tooltip-left .arrow::before, .bs-tooltip-auto[x-placement^="left"] .arrow::before { left: 0; border-width: 0.4rem 0 0.4rem 0.4rem; border-left-color: #000; }
+.bs-tooltip-left .arrow::before, .bs-tooltip-auto[x-placement^="left"] .arrow::before { left: 0; border-width: 0.4rem 0 0.4rem 0.4rem; border-left-color: rgba(0, 0, 0, 0.7); }
 
-.tooltip-inner { max-width: 200px; padding: 0.25rem 0.5rem; color: #fff; text-align: center; background-color: #000; border-radius: 0.25rem; }
+.tooltip-inner { max-width: 200px; padding: 0.25rem 0.5rem; color: #fff; text-align: center; background-color: rgba(0, 0, 0, 0.7); border-radius: 0.25rem; }
 
 .popover { position: absolute; top: 0; left: 0; z-index: 1060; display: block; max-width: 276px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; font-style: normal; font-weight: 400; line-height: 1.5; text-align: left; text-align: start; text-decoration: none; text-shadow: none; text-transform: none; letter-spacing: normal; word-break: normal; word-spacing: normal; white-space: normal; line-break: auto; font-size: 0.875rem; word-wrap: break-word; background-color: #fff; background-clip: padding-box; border: 1px solid rgba(0, 0, 0, 0.2); border-radius: 0.3rem; }
 
@@ -2477,5 +2477,9 @@ table.dataTable thead th.sorting_desc:after { content: "\f0dd"; }
 .underline { position: relative; }
 
 .underline:after { content: ""; position: absolute; height: 2px; width: 60%; bottom: -4px; left: 0; right: 0; background: #6c757d; }
+
+.search-tooltip { opacity: 0; background: rgba(0, 0, 0, 0.7); color: #fff; border-radius: 10px; position: absolute; top: 52px; left: 19px; z-index: 2; transition: opacity 0.5s; }
+
+.search-tooltip::after { content: " "; position: absolute; bottom: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: transparent transparent rgba(0, 0, 0, 0.7) transparent; }
 
 /*# sourceMappingURL=main.css.map */
