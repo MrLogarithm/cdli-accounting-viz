@@ -372,13 +372,19 @@ def commodify_whole_corpus():
                             word_i.replace("_COM",""), 
                             word_j.replace("_COM","")]))
                         collocation_counts[ key ] += 1
-    all_objects = sorted(list(counts_by_commodity.keys()))
+    all_objects = sorted(list([re.sub('_[A-Z]{3}', '', k) for k in counts_by_commodity.keys()]))
+    output_dictionary = {
+            word:list(dictionary[word])[0][0] 
+            for word in all_objects
+            if len(dictionary[word]) > 0
+        }
 
     output_json = {
             "counts_by_commodity": dict(counts_by_commodity),
             "values_by_commodity": dict(values_by_commodity),
             "collocation_counts":  dict(collocation_counts),
             "all_objects": all_objects,
+            "dictionary":output_dictionary,
         }
 
     return output_json
