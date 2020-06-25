@@ -140,6 +140,7 @@ def is_commodity_synset( word, synsets ):
             "SZIM", # aromatic/perfume
             "szim",
             "szuku", # ration
+            "szum2",
             "tug2",
             "ud5", # goat
         ]

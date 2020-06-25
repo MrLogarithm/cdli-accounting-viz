@@ -327,6 +327,9 @@ def commodify_whole_corpus():
             else:
                 count, values = "", []
 
+            if any("szum2" in w for w in entry.words):
+                print(entry.words)
+
             for i,word in enumerate(entry.words):
                 if word.endswith("_COM"):
                     # Don't count broken commodities 
