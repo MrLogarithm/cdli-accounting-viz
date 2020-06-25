@@ -10,6 +10,43 @@ $("#search-button").click(function(e){
   do_search();
 });
 
+function central_tendency( arr ) {
+  arr = arr.sort();
+  var sum = 0;
+  var sum_sq = 0;
+  var mode = undefined;
+  var mode_count = 0;
+  var curr_mode = undefined;
+  var curr_mode_count = 0;
+  for ( var elem of arr ) {
+    sum += elem;
+    sum_sq += elem*elem;
+    if (curr_mode === undefined) {
+      curr_mode = elem;
+    }
+    if (elem == curr_mode) {
+      curr_mode_count += 1;
+    } else {
+      if (curr_mode_count>mode_count){
+	mode = curr_mode;
+	mode_count = curr_mode_count;
+      }
+      curr_mode = elem;
+      curr_mode_count = 1;
+    }
+  }
+  var mean = sum/arr.length;
+  var variance = (sum_sq/arr.length) + ((sum*sum)/(arr.length*arr.length));
+  return {
+    'mean':Math.round(100*mean)/100,
+    'median':Math.round(
+      100*arr[Math.round(arr.length/2)]
+    )/100,
+    'mode':Math.round(100*mode)/100,
+    "stdev":Math.round(100*Math.sqrt(variance))/100,
+  };
+}
+
 /* If the search term is in the dataset, 
  * redraw the figures and update the page.
  */
@@ -32,25 +69,32 @@ function do_search() {
     /* Get total value of counted objects: */
     var values = json_data.values_by_commodity[ labeled_query ];
     var total_values = {};
+    var values_by_system = {}
     var units = {};
     values.forEach(function(readings) {
       readings.forEach(function(reading) {
 	if (! total_values.hasOwnProperty(reading.system)) {
 	  total_values[reading.system] = 0;
+	  values_by_system[reading.system] = [];
 	  units[reading.system] = reading.unit;
 	}
 	if (reading.value != "none" ) {
 	  total_values[reading.system] += reading.value;
+	  values_by_system[reading.system].push( reading.value );
 	}
       });
     });
+    // TODO get this from the radio buttons
     var system = "cardinal";
     console.log(total_values);
     $("#label-total-value").html( Math.round(total_values[system]) + " " + units[system] );
 
-
+    var central_tendencies = central_tendency( values_by_system[system] );
+    $("#mean").html( central_tendencies['mean'] );
+    $("#median").html( central_tendencies['median'] );
+    $("#mode").html( central_tendencies['mode'] );
+    $("#stdev").html( central_tendencies['stdev'] );
     // TODO redraw radio buttons based on observed counts
-    // 
   } else {
     /* Show "Word not recognized" tooltip */
     $('.search-tooltip').css("opacity",1);

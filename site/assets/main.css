@@ -2448,9 +2448,9 @@ table.dataTable thead th.sorting_asc:after { content: "\f0de"; }
 
 table.dataTable thead th.sorting_desc:after { content: "\f0dd"; }
 
-.dataTables_filter { position: absolute; top: 9px; right: 180px; }
+.dataTables_filter { position: absolute; top: 9px; left: 130px; }
 
-.dataTables_filter input { border-radius: 20px; padding-left: 8px; border: 1px solid #dee2e6 !important; }
+.dataTables_filter input { border-radius: 20px; padding-left: 8px; border: 1px solid #dee2e6 !important; width: 170px; }
 
 /* Reduce number of columns in bootstrap's .card-columns: */
 @media (min-width: 576px) and (max-width: 767.98px) { .card-columns { column-count: 1; } }

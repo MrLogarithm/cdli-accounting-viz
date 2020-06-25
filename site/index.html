@@ -54,8 +54,42 @@
 	<div class='col-md-12'><b id='label-total-value'>m</b> counted across <b id='label-total-entries'>n</b> entries</div>
       </div>
       <div class="row">
-	<div class='col-md-6'>central tendency</div>
-	<div class='col-md-6'>variation</div>
+	<div class='col-md-6'>
+	  <div class='row'>
+	    <div class='col-md-6'>
+	      mean:
+	    </div>
+	    <div class='col-md-6'>
+	      <span id='mean'>0</span><br/>
+	    </div>
+	  </div>
+	  <div class='row'>
+	    <div class='col-md-6'>
+	      median:
+	    </div>
+	    <div class='col-md-6'>
+	      <span id='median'>0</span><br/>
+	    </div>
+	  </div>
+	  <div class='row'>
+	    <div class='col-md-6'>
+	      mode:
+	    </div>
+	    <div class='col-md-6'>
+	      <span id='mode'>0</span><br/>
+	    </div>
+	  </div>
+	</div>
+	<div class='col-md-6'>
+	  <div class='row'>
+	    <div class='col-md-6'>
+	      std. deviation:
+	    </div>
+	    <div class='col-md-6'>
+	      <span id='stdev'>0</span><br/>
+	    </div>
+	  </div>
+	</div>
       </div>
     </div>
   </div>
@@ -63,18 +97,18 @@
   <div class="card mb-5 card-scroll">
     <div class="card-header">
       <b>Similar Items</b>
+      <span class='text-secondary float-right pl-2'>
+	Full
+      </span>
       <div class='float-right'>
-	<span class='text-secondary'>
-	  Reduced
-	</span>
         <label class="switch">
           <input id="toggle-delta" type="checkbox">
           <span class="slider round"></span>
         </label>
-	<span class='text-secondary'>
-	  Full
-	</span>
       </div>
+      <span class='text-secondary float-right pr-2'>
+	Reduced
+      </span>
     </div>
     <div class='card-body card-content-scroll'>
       <div class='row mb-2'>
@@ -166,18 +200,18 @@
   <div class="card mb-5 card-scroll">
     <div class="card-header">
       <b>Nearby Items</b>
+      <span class='text-secondary pl-2 float-right'>
+	Graph
+      </span>
       <div class='float-right'>
-	<span class='text-secondary'>
-	  Table
-	</span>
         <label class="switch">
           <input id="toggle-nearby" type="checkbox">
           <span class="slider round"></span>
         </label>
-	<span class='text-secondary'>
-	  Graph
-	</span>
       </div>
+      <span class='text-secondary pr-2 float-right'>
+	Table
+      </span>
     </div>
 
     <div id='graph-nearby-div' class='d-none'>
@@ -225,18 +259,18 @@
   <div class="card mb-5 card-scroll">
     <div class="card-header">
       <b>Descriptors</b>
+      <span class='text-secondary pl-2 float-right'>
+	Graph
+      </span>
       <div class='float-right'>
-	<span class='text-secondary'>
-	  Table
-	</span>
         <label class="switch">
           <input id="toggle-desc" type="checkbox">
           <span class="slider round"></span>
         </label>
-	<span class='text-secondary'>
-	  Graph
-	</span>
       </div>
+      <span class='text-secondary pr-2 float-right'>
+	Table
+      </span>
     </div>
 
     <div id='graph-desc-div' class='d-none'>
