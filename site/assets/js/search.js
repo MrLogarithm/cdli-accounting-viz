@@ -10,7 +10,7 @@ $("#search-button").click(function(e){
   do_search();
 });
 
-function central_tendency( arr ) {
+function summary_stats( arr ) {
   arr = arr.sort();
   var sum = 0;
   var sum_sq = 0;
@@ -86,14 +86,16 @@ function do_search() {
     });
     // TODO get this from the radio buttons
     var system = "cardinal";
-    console.log(total_values);
+    hist_data = values_by_system[system].map(x => Object({value:x}));
+    draw_histogram( hist_data );
+    //console.log(total_values);
     $("#label-total-value").html( Math.round(total_values[system]) + " " + units[system] );
 
-    var central_tendencies = central_tendency( values_by_system[system] );
-    $("#mean").html( central_tendencies['mean'] );
-    $("#median").html( central_tendencies['median'] );
-    $("#mode").html( central_tendencies['mode'] );
-    $("#stdev").html( central_tendencies['stdev'] );
+    var stats = summary_stats( values_by_system[system] );
+    $("#mean").html( stats['mean'] );
+    $("#median").html( stats['median'] );
+    $("#mode").html( stats['mode'] );
+    $("#stdev").html( stats['stdev'] );
     // TODO redraw radio buttons based on observed counts
   } else {
     /* Show "Word not recognized" tooltip */

@@ -67,6 +67,8 @@ $(document).ready(function(){
     success: function( result ) {
 	console.log( result );
 	json_data = result;
+  	$('#search-input').val("kusz");
+  	do_search();
     },
   });
 });
