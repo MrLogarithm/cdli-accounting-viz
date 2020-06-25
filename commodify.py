@@ -301,9 +301,11 @@ def commodify( text ):
 
 def commodify_whole_corpus():
     # *_COM -> num string -> number of occurrences
-    counts_by_commodity     = defaultdict(lambda:defaultdict(int))
+    counts_by_commodity          = defaultdict(lambda:defaultdict(int))
+    counts_by_modified_commodity = defaultdict(lambda:defaultdict(int))
     # *_COM -> [values]
-    values_by_commodity     = defaultdict(list)
+    values_by_commodity          = defaultdict(list)
+    values_by_modified_commodity = defaultdict(list)
     # (*_COM, *_COM) -> number of cooccurrences
     collocation_counts = defaultdict(int)
 
@@ -350,11 +352,13 @@ def commodify_whole_corpus():
 
                     # JSON keys can't be tuples:
                     key = ' '.join(modified)
-                    counts_by_commodity[ key ][ count ] += 1
+                    counts_by_commodity[ commodity ][ count ] += 1
+                    counts_by_modified_commodity[ key ][ count ] += 1
                     # TODO How do we want to resolve ambiguous values?
                     # As baseline, just pick the first possible value:
                     if values != []:
-                        values_by_commodity[ key ].append( values )
+                        values_by_commodity[ commodity ].append( values )
+                        values_by_modified_commodity[ key ].append( values )
 
         for i in range(len(entries)):
             for j in range(i+1,len(entries)):
@@ -381,7 +385,9 @@ def commodify_whole_corpus():
 
     output_json = {
             "counts_by_commodity": dict(counts_by_commodity),
+            "counts_by_modified_commodity": dict(counts_by_modified_commodity),
             "values_by_commodity": dict(values_by_commodity),
+            "values_by_modified_commodity": dict(values_by_modified_commodity),
             "collocation_counts":  dict(collocation_counts),
             "all_objects": all_objects,
             "dictionary":output_dictionary,
