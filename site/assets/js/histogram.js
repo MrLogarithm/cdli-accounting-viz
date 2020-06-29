@@ -19,17 +19,6 @@ function draw_histogram( query, system ) {
     success: function( result ) {
 
       data = result;
-  /*data = [
-    {"value":1}, 
-    {"value":1}, 
-    {"value":1}, 
-    {"value":2}, 
-    {"value":2}, 
-    {"value":3}, 
-    {"value":4}, 
-    {"value":5}, 
-  ];*/
-
 
   d3.select("#histogram-main").select("svg").remove();
   var svg = d3.select("#histogram-main")
