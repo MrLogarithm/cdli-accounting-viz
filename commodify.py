@@ -1,4 +1,3 @@
-from nltk.corpus import wordnet as wn
 import json
 import segment
 import convert
@@ -26,6 +25,7 @@ dictionary = np.load( "dict/epsd.npz", allow_pickle=True )["dictionary"].item()
 # For now, just map some manually identified cases as
 # proof of concept:
 sign_substitutions = {
+        #'sign in the dictionary':'sign in the corpus',
         "zid2":"zi3",
         "kug":"ku3",
         "ku3":"kug",
@@ -38,7 +38,7 @@ def substitute( sign ):
         return
     else:
         for s in sign_substitutions:
-            yield re.sub("(^|-)"+s+"(-|$)","\\1"+sign_substitutions[s]+"\\2",sign)
+            yield re.sub("(^|-|\()"+s+"(-|$|\))","\\1"+sign_substitutions[s]+"\\2",sign)
     return 
 
 # Emend the dictionary:
@@ -94,15 +94,20 @@ commodity_determinatives = set([
 # Mutable alternative to namedtuple:
 Entry = make_dataclass("Entry",
         [
-            ("count",dict),
+            ("counts",list),
             ("words",list)
         ], defaults=[
-            None,
+            [],
             []
         ]) 
 
 def new_entry():
     entry = Entry()
+    # Initialize these as empty lists:
+    # otherwise python makes a shallow
+    # copy and all entries end up sharing
+    # the same list of words:
+    entry.counts = []
     entry.words = []
     return entry
 
@@ -202,6 +207,8 @@ def label_wordlist( words ):
     # can both be commodities but udu here acts as a modifier.
     mod_proximity_threshold = 3
     for i in range(len(words)):
+        if words[0] in set(["ki-la2-bi"]) and words[i] == "na4":
+            continue
         context = words[max(0,i-mod_proximity_threshold):i]
         if features[i][0] == FEAT_COM:
             # This check helps avoid labeling modifiers
@@ -261,14 +268,14 @@ def commodify( text ):
     found_com = False
     
     if not isinstance( text, list ):
-        text = [ re.sub("@[a-zA-Z]*","",word) for word in text ]
+        text = [ re.sub("@[a-zA-Z]*","",word) for word in text.strip().split(" ") ]
         text = segment.segment( text )
     else:
         # Standardize notation: asz@c -> asz, ASZxDISZ@t -> ASZxDISZ, etc
         # These represent curved/flat/rotated/variant sign forms
         # but we care about a more granular level of detail
         text = [ [ re.sub("@[a-zA-Z]*","",word) for word in line ] for line in text ]
-        text = [ segment.segment( line ) for line in text ]
+        text = sum([ segment.segment( line ) for line in text ],[])
 
     for entry_ in text:
 
@@ -279,7 +286,7 @@ def commodify( text ):
                 #entry.words = label_wordlist( entry.words )
                 #entries.append( entry )
                 #entry = new_entry()
-                entry.count = {"string":string, "readings":counts}
+                entry.counts.append( {"string":string, "readings":counts} )
                 entry.words.append( "###" )
             else:
                 entry.words.append( string )
@@ -289,74 +296,104 @@ def commodify( text ):
     # Tag and append the final entry:
     #entry.words = label_wordlist( entry.words )
     #entries.append( entry )
-    entries = [ entry for entry in entries if not (entry.count is None and entry.words == [])]
+    entries = [ entry for entry in entries if not (entry.counts == [] and entry.words == [])]
     return entries
 
 def commodify_whole_corpus():
     # *_COM -> num string -> number of occurrences
-    counts_by_commodity = defaultdict(lambda:defaultdict(int))
+    counts_by_commodity          = defaultdict(lambda:defaultdict(int))
+    counts_by_modified_commodity = defaultdict(lambda:defaultdict(int))
     # *_COM -> [values]
-    values_by_commodity = defaultdict(list)
+    values_by_commodity          = defaultdict(list)
+    values_by_modified_commodity = defaultdict(list)
     # (*_COM, *_COM) -> number of cooccurrences
     collocation_counts = defaultdict(int)
 
     commodified_texts = []
     for text in data.girsu_lined:
         commodified_texts.append( commodify( text ) )
+        #for e in commodified_texts[-1]:
+            #print(e.words)
 
     for entries in commodified_texts:
-        if len(entries) > 5 and len(entries) < 50:
-            for entry in entries:
+        for entry in entries:
                 
-                if entry.words.count("###") > 1:
-                    continue
+            #if entry.words.count("###") > 1:
+                #continue
 
-                if entry.count is not None:
-                    count = entry.count["string"]
-                    values = entry.count["readings"]
-                else:
-                    count, values = "", []
+            if entry.counts != []:
+                count = entry.counts[0]["string"]
+                values = entry.counts[0]["readings"]
+            else:
+                count, values = "", []
 
-                for word in entry.words:
-                    if word.endswith("_COM"):
-                        # Don't count broken commodities 
-                        # like ...{ku6}:
-                        if '...' in word:
+            if any("szum2" in w for w in entry.words):
+                print(entry.words)
+
+            for i,word in enumerate(entry.words):
+                if word.endswith("_COM"):
+                    # Don't count broken commodities 
+                    # like ...{ku6}:
+                    if '...' in word:
+                        continue
+
+                    # In cases like udu_COM nita_MOD,
+                    # retrieve the modifier:
+                    commodity = word#.replace("_COM","")
+                    modified  = [commodity]
+                    for w in entry.words[i+1:]:
+                        if w.endswith("_MOD"):
+                            modified.append(w)#.replace("_MOD",""))
+                        if w.endswith("_COM") or w == "###":
+                            break
+
+                    # TODO How to handle unreadable counts? 
+                    # Probably count every instance of the commodity,
+                    # so that people can accurately say such-and-such
+                    # occurs N times in the corpus, but omit "none"
+                    # from the list of values? 
+
+                    # JSON keys can't be tuples:
+                    key = ' '.join(modified)
+                    counts_by_commodity[ commodity ][ count ] += 1
+                    counts_by_modified_commodity[ key ][ count ] += 1
+                    # TODO How do we want to resolve ambiguous values?
+                    # As baseline, just pick the first possible value:
+                    if values != []:
+                        values_by_commodity[ commodity ].append( values )
+                        values_by_modified_commodity[ key ].append( values )
+
+        for i in range(len(entries)):
+            for j in range(i+1,len(entries)):
+                for word_i in entries[i].words:
+                    if not word_i.endswith( "_COM" ):
+                        continue
+                    for word_j in entries[j].words:
+                        if not word_j.endswith( "_COM" ):
                             continue
-                        # TODO How to handle unreadable counts? 
-                        # Probably count every instance of the commodity,
-                        # so that people can accurately say such-and-such
-                        # occurs N times in the corpus, but omit "none"
-                        # from the list of values? 
-                        word = word.replace( "_COM", "" )
-                        counts_by_commodity[ word ][ count ] += 1
-                        # TODO How do we want to resolve ambiguous values?
-                        # As baseline, just pick the first possible value:
-                        if values != []:
-                            values_by_commodity[ word ].append( values )
-
-            for i in range(len(entries)):
-                for j in range(i+1,len(entries)):
-                    for word_i in entries[i].words:
-                        if not word_i.endswith( "_COM" ):
-                            continue
-                        for word_j in entries[j].words:
-                            if not word_j.endswith( "_COM" ):
-                                continue
-                            # dict can only store tuple values
-                            # for consistency, sort the keys
-                            # and provide and accessor that 
-                            # sorts queries likewise
-                            key = tuple(sorted([
-                                word_i.replace("_COM",""), 
-                                word_j.replace("_COM","")]))
-                            collocation_counts[ word_i, word_j ] += 1
-    all_objects = counts_by_commodity.keys()
+                        # dict can only store tuple values
+                        # for consistency, sort the keys
+                        # and provide and accessor that 
+                        # sorts queries likewise
+                        key = ' '.join(sorted([
+                            word_i.replace("_COM",""), 
+                            word_j.replace("_COM","")]))
+                        collocation_counts[ key ] += 1
+    all_objects = sorted(list([re.sub('_[A-Z]{3}', '', k) for k in counts_by_commodity.keys()]))
+    output_dictionary = {
+            word:list(dictionary[word])[0][0] 
+            for word in all_objects
+            if len(dictionary[word]) > 0
+        }
 
     output_json = {
             "counts_by_commodity": dict(counts_by_commodity),
+            "counts_by_modified_commodity": dict(counts_by_modified_commodity),
             "values_by_commodity": dict(values_by_commodity),
-            "all_objects": list(all_objects),
+            "values_by_modified_commodity": dict(values_by_modified_commodity),
+            "collocation_counts":  dict(collocation_counts),
+            "all_objects": all_objects,
+            "dictionary":output_dictionary,
         }
 
     return output_json
@@ -365,5 +402,5 @@ if __name__ == "__main__":
     output_json = commodify_whole_corpus()
 
     outfile = open("commodities.json", "w")
-    json.dump( output_json, outfile )
+    json.dump( output_json, outfile, indent=2 )
     outfile.close()

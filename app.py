@@ -1,6 +1,7 @@
 #!flask/bin/python
 from flask import Flask, jsonify, request, abort, make_response
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask_caching import Cache
 from commodify import *
 from convert import *
 import data
@@ -10,7 +11,14 @@ import scipy.stats
 from functools import wraps
 import time
 
+config = {
+        "CACHE_TYPE": "simple",
+        "CACHE_DEFAULT_TIMEOUT": 3600,
+    }
+
 app = Flask(__name__)
+app.config.from_mapping( config )
+cache = Cache( app )
 
 ##################################################
 # SWAGGER DOCUMENTATION
@@ -177,13 +185,16 @@ def commodify_post():
             return make_response(
                 jsonify({'error': 'Please specify \'cdli_no\' or \'text\', not both.'}), 
                 400)
-        text = data.get_by_CDLI_no( request.json['cdli_no'] )
+        text = ' '.join( data.get_by_CDLI_no( request.json['cdli_no'] ) )
     elif 'text' in request.json:
         text = data.clean( request.json['text'] )
+        text = ' '.join(text)
     else:
         return make_response(
             jsonify({'error': 'Missing parameter \'cdli_no\' or \'text\'.'}), 
             400)
+    #print(text)
+
     # convert to tuple so that objects are serializable:
     response = commodify( text )
     response = {"entries": [

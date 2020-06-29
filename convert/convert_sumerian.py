@@ -290,14 +290,19 @@ def convert( num, sign_vals=None ):
 
     if sign_vals is None:
         result = []
-        for system in num_systems:
-            if system.canParse( num ):
-                try:
-                    converted = convert( num, system )
-                    result += converted 
-                except:
-                    pass
-        return result
+        # If there is no unit, assume
+        # a cardinal number:
+        if Cardinal.canParse( num ):
+            return convert( num, Cardinal )
+        else:
+            for system in num_systems:
+                if system.canParse( num ):
+                    try:
+                        converted = convert( num, system )
+                        result += converted 
+                    except:
+                        pass
+            return result
 
     if isinstance( sign_vals, str ):
         for system in num_systems:

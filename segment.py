@@ -18,7 +18,8 @@ def segment( text, greedy=True ):
     """
 
     # Output array:
-    segmented = []
+    segmented = [[]]
+    seen_numeral = False
 
     i = 0
     while i < len(text):
@@ -64,14 +65,19 @@ def segment( text, greedy=True ):
             string = convert.number_system.normalize( string )
             conversion = convert.convert_sumerian.convert( string )
 
-            segmented.append( (string, conversion) )
+            if seen_numeral:
+                segmented.append([])
+            else:
+                seen_numeral = True
+            segmented[-1].append( (string, conversion) )
         else:
             string = text[i]
-            segmented.append( (string, None) )
+            segmented[-1].append( (string, None) )
 
         # How many tokens did we consume?
         i += length
 
+    segmented = [entry for entry in segmented if entry != []]
     return segmented
 
 if __name__ == "__main__":

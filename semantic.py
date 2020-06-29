@@ -1,5 +1,14 @@
 #!/bin/python
-from nltk.corpus import wordnet as wn
+import nltk
+try:
+    nltk.find('corpora/wordnet')
+except LookupError:
+    nltk.download('wordnet')
+try:
+    from nltk.corpus import wordnet as wn
+except:
+    nltk.download('wordnet', force=True)
+    from nltk.corpus import wordnet as wn
 
 import json
 import segment
@@ -131,6 +140,7 @@ def is_commodity_synset( word, synsets ):
             "SZIM", # aromatic/perfume
             "szim",
             "szuku", # ration
+            "szum2",
             "tug2",
             "ud5", # goat
         ]
@@ -143,6 +153,7 @@ def is_commodity_synset( word, synsets ):
     whitelist_syns = [
             "implement.", 
             'tool.', 
+            'gear.n.04',
             'musical_instrument.', 
 
             'food.', 
@@ -150,6 +161,7 @@ def is_commodity_synset( word, synsets ):
 
             'material.', 
             'clothing.', 
+            'fabric.',
 
             "metal", 
             "stone.", 
