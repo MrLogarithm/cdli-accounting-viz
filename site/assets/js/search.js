@@ -75,6 +75,7 @@ function redraw_main_histogram( query ) {
           update_summary_stats( query, this.value );
           show_modifier_list( query, this.value );
           show_colloc_list( query, this.value );
+          show_concordance( query, this.value );
 	}
       });
 

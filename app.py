@@ -298,6 +298,19 @@ def values_post():
         ]
     return jsonify(values), 200
 
+@app.route('/concordance', methods=['POST','GET'])
+@allow_jsonp
+@enforce_params( required=["word","system"] )
+def concordance_post():
+    word = get_param( "word" )
+    system = get_param( "system" )
+    lines = [
+            {"line":line, "value":json_data["line_data"][line]["value"], "count":count} 
+            for line,count in json_data["line_counts"].items()
+            if word in json_data["line_data"][line]["counted"]
+        ]
+    return jsonify(lines), 200
+
 @app.route('/modifiers', methods=['POST','GET'])
 @allow_jsonp
 @enforce_params( required=["word","system"] )

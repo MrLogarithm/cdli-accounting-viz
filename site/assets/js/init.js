@@ -8,6 +8,7 @@ table_format = {
     search:"",
     searchPlaceholder:'Filter'
   },
+  paging: false,
 }; 
 // r: pRocessing (show spinner when working)
 // t: show Table
@@ -15,6 +16,11 @@ $("#table-nearby").DataTable(table_format);
 $("#table-desc").DataTable(table_format);
 // This table should be ordered by column 2:
 table_format.order[0][0] = 2;
+table_format.columns = [
+  {type:"string"},
+  {type:"num"},
+  {type:"num"},
+];
 $("#table-concordance").DataTable(table_format);
 
 

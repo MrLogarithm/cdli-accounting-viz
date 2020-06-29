@@ -95,8 +95,10 @@ commodity_determinatives = set([
 Entry = make_dataclass("Entry",
         [
             ("counts",list),
-            ("words",list)
+            ("words",list),
+            ("words_full",list),
         ], defaults=[
+            [],
             [],
             []
         ]) 
@@ -109,6 +111,7 @@ def new_entry():
     # the same list of words:
     entry.counts = []
     entry.words = []
+    entry.words_full = []
     return entry
 
 def label_wordlist( words ):
@@ -288,8 +291,10 @@ def commodify( text ):
                 #entry = new_entry()
                 entry.counts.append( {"string":string, "readings":counts} )
                 entry.words.append( "###" )
+                entry.words_full.append( string )
             else:
                 entry.words.append( string )
+                entry.words_full.append( string )
         entry.words = label_wordlist( entry.words )
         entries.append( entry )
 
@@ -309,6 +314,9 @@ def commodify_whole_corpus():
     # (*_COM, *_COM) -> number of cooccurrences
     collocation_counts = defaultdict(int)
 
+    lines = defaultdict(int)
+    lines_extra = defaultdict(lambda:{"counted":[],"value":None,"modifiers":[]})
+
     commodified_texts = []
     for text in data.girsu_lined:
         commodified_texts.append( commodify( text ) )
@@ -318,8 +326,14 @@ def commodify_whole_corpus():
     for entries in commodified_texts:
         for entry in entries:
                 
-            #if entry.words.count("###") > 1:
-                #continue
+            # TODO if len(entry.counts) > 1: ???
+            lines[ ' '.join(entry.words_full) ] += 1
+            lines_extra[ ' '.join(entry.words_full) ]["counted"] = [w for w in entry.words if "_COM" in w]
+            lines_extra[ ' '.join(entry.words_full) ]["modifiers"] = [w for w in entry.words if "_MOD" in w]
+            try:
+                lines_extra[ ' '.join(entry.words_full) ]["value"] = entry.counts[0]["readings"]
+            except:
+                pass
 
             if entry.counts != []:
                 count = entry.counts[0]["string"]
@@ -327,8 +341,8 @@ def commodify_whole_corpus():
             else:
                 count, values = "", []
 
-            if any("szum2" in w for w in entry.words):
-                print(entry.words)
+            #if any("szum2" in w for w in entry.words):
+                #print(entry.words)
 
             for i,word in enumerate(entry.words):
                 if word.endswith("_COM"):
@@ -394,6 +408,8 @@ def commodify_whole_corpus():
             "collocation_counts":  dict(collocation_counts),
             "all_objects": all_objects,
             "dictionary":output_dictionary,
+            "line_counts":lines,
+            "line_data":lines_extra,
         }
 
     return output_json
