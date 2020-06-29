@@ -8,11 +8,8 @@ MarkupSafe==1.1.1
 numpy==1.18.4
 python-Levenshtein==0.12.0
 recordclass==0.13.2
-<<<<<<< Updated upstream
-=======
 regex==2020.6.8
 scipy==1.5.0
 tqdm==4.46.1
->>>>>>> Stashed changes
 Werkzeug==1.0.1
 flask-swagger-ui==3.25.0

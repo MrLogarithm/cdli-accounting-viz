@@ -184,11 +184,6 @@ def commodify_post():
         return make_response(
             jsonify({'error': 'Missing parameter \'cdli_no\' or \'text\'.'}), 
             400)
-<<<<<<< Updated upstream
-=======
-    #print(text)
->>>>>>> Stashed changes
-
     # convert to tuple so that objects are serializable:
     response = commodify( text )
     response = {"entries": [
@@ -196,8 +191,6 @@ def commodify_post():
         ]}
     return jsonify( response ), 200
 
-<<<<<<< Updated upstream
-=======
 @app.route('/getNumberSystems', methods=['POST', 'GET'])
 @allow_jsonp
 @enforce_params( required=["word"] )
@@ -320,7 +313,6 @@ def modifiers_post():
 def coms_get():
     return make_response( json_data, 200 )
 
->>>>>>> Stashed changes
 @app.route('/swagger.json', methods=['GET'])
 def spec_get():
     json_f = open( "swagger.json" )
