@@ -117,7 +117,7 @@ def get_param( key ):
     if request.method == "POST":
         return request.json[key]
     elif request.method == "GET":
-        return request.args.get(key, False)
+        return request.args.get(key, None)
 
 ##################################################
 # API endpoints:
@@ -281,6 +281,81 @@ def colloc_post():
             } 
             for colloc, count in collocations.items()
         ]
+    return jsonify(result), 200
+
+@app.route('/collocationsGraph', methods=['POST','GET'])
+@allow_jsonp
+@enforce_params( required=["word"] )
+def colloc_graph_post():
+    word = get_param( "word" )
+    word = re.sub("_[^ ]*", "", word)
+
+    min_freq = get_param("min_freq")
+    if min_freq is None:
+        min_freq = 0.18
+
+    def get_other( colloc ):
+        #colloc = colloc.split(" ")
+        if colloc[0] == word:
+            return colloc[1]
+        return colloc[0]
+
+    collocations = json_data["collocation_counts"]
+
+    collocation_lists = defaultdict(dict)
+    c = { 
+        tuple(sorted(colloc.split(" "))):count
+        for colloc,count in collocations.items() 
+        if word in colloc.split(" ")
+    }
+    collocation_lists.update(c)
+
+    distance = 2
+    for d in range(2,distance+1):
+        # Get words in outer ring of the graph:
+        source_words = set(sum([[u,v] for u,v in collocation_lists],[]))
+        for w in source_words:
+            c = { 
+                tuple(sorted(colloc.split(" "))):count
+                for colloc,count in collocations.items() 
+                if w in colloc.split(" ")
+            }
+            collocation_lists.update(c)
+    print(collocation_lists)
+    # TODO get more distant neighbors
+
+    #nodelist = [word] + [ get_other(colloc) for colloc in collocation_lists ]
+    #nodes = [ {"id":node,"group":1} for node in nodelist ]
+    nodes = list(set(sum([[w1,w2] for w1,w2 in collocation_lists],[])))
+    nodes = [ {
+        "id":n,
+        "group":1 if n==word else 2,
+        "freq":collocations["%s %s"%(n,word)] 
+            if "%s %s"%(n,word) in collocations 
+            else collocations["%s %s"%(word,n)]
+            if "%s %s"%(word,n) in collocations 
+            else 0
+        } for n in nodes ]
+    edges = [ {
+        "source":w1,
+        "target":w2,
+        "value":collocations["%s %s"%(w1,w2)] 
+            if "%s %s"%(w1,w2) in collocations 
+            else collocations["%s %s"%(w2,w1)]
+        } for (w1,w2) in collocation_lists]
+    scale = max(e["value"] for e in edges)
+    for e in edges:
+        e["value"] /= scale 
+        #//e["value"] = np.sqrt(e["value"])
+    edges = [e for e in edges if e["value"] >= min_freq]
+    nodes = [n for n in nodes if any(e["source"]==n["id"] or e["target"]==n["id"] for e in edges)]
+    print(edges)
+    print(len(edges))
+    print(min_freq)
+    result = {
+                "nodes": nodes,
+                "links": edges
+            } 
     return jsonify(result), 200
 
 @app.route('/allValues', methods=['POST','GET'])

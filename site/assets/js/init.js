@@ -39,6 +39,24 @@ $('#toggle-delta').click(function() {
   $('.similarity-full').toggleClass('d-none');
 });
 
+/* Disable mousewheel when over figures: */
+// https://stackoverflow.com/questions/7571370/jquery-disable-scroll-when-mouse-over-an-absolute-div
+$('#graph-nearby-div').hover(function() {
+    $(document).bind('mousewheel DOMMouseScroll',function(){ 
+        stopWheel(); 
+    });
+}, function() {
+    $(document).unbind('mousewheel DOMMouseScroll');
+});
+function stopWheel(e){
+    if(!e){ /* IE7, IE8, Chrome, Safari */
+        e = window.event;
+    }
+    if(e.preventDefault) { /* Chrome, Safari, Firefox */
+        e.preventDefault();
+    }
+    e.returnValue = false; /* IE7, IE8 */
+}
 
 
 json_data = {};
