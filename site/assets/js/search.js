@@ -1,3 +1,6 @@
+global_query = undefined;
+global_system = undefined;
+
 /* Trigger search function when the user
  * presses Enter or clicks the search button:
  */
@@ -70,12 +73,19 @@ function redraw_main_histogram( query ) {
       $('.hist-select').change(function(){
 	if ( this.checked ) {
 	  // update histogram
-	  console.log("redrawing histogram with system",this.value);
-          draw_histogram( query, this.value );
+	  //console.log("redrawing histogram with system",this.value);
+	  global_system = this.value;
+          
+	  draw_histogram( query, this.value );
           update_summary_stats( query, this.value );
-          show_modifier_list( query, this.value );
+          
+	  show_modifier_list( query, this.value );
+	  show_modifier_graph( query, this.value );
+
           show_colloc_list( query, this.value );
-          show_concordance( query, this.value );
+	  show_colloc_graph( query, this.value );
+          
+	  show_concordance( query, this.value );
 	}
       });
 
@@ -91,6 +101,7 @@ function redraw_main_histogram( query ) {
  */
 function do_search() {
   query = $("#search-input").val();
+  global_query = query;
 
   // TODO handle modifiers and number system filters
   labeled_query = query + "_COM";

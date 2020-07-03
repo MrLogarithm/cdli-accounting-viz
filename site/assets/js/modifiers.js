@@ -19,3 +19,17 @@ function show_modifier_list( query, system ) {
     },
   });
 }
+
+function show_modifier_graph( query, system ) {
+  $.ajax({
+    async: false,
+    url: api_base_url + "/modifiersGraph",
+    type: "POST",
+    crossDomain: true,
+    data: new URLSearchParams({"word": query,"system":system}).toString(),
+    dataType: "jsonp",
+    success: function( result ) {
+      draw_fdg(result, "desc");
+    },
+  });
+}

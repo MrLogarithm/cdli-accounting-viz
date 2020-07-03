@@ -27,12 +27,12 @@ $("#table-concordance").DataTable(table_format);
 
 /* Setup toggles for force directed graphs: */
 $('#toggle-nearby').click(function() {
-  $('#graph-nearby-div').toggleClass('d-none');
-  $('#table-nearby-div').toggleClass('d-none');
+  $('#graph-div-colloc').toggleClass('d-none');
+  $('#table-div-colloc').toggleClass('d-none');
 });
 $('#toggle-desc').click(function() {
-  $('#graph-desc-div').toggleClass('d-none');
-  $('#table-desc-div').toggleClass('d-none');
+  $('#graph-div-desc').toggleClass('d-none');
+  $('#table-div-desc').toggleClass('d-none');
 });
 $('#toggle-delta').click(function() {
   $('.similarity-reduced').toggleClass('d-none');

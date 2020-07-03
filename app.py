@@ -283,16 +283,46 @@ def colloc_post():
         ]
     return jsonify(result), 200
 
+@app.route('/modifiersGraph', methods=['POST','GET'])
+@allow_jsonp
+@enforce_params( required=["word"] )
+def modifier_graph_post():
+    #edges = [e for e in edges if e["value"] >= min_link_strength]
+    edges = [ {
+        "source":"a",
+        "target":"b",
+        "value":1
+    } ]
+    nodes = [ {
+        "id":"a",
+        "group":0,
+    },
+    {
+        "id":"b",
+        "group":1,
+    }]
+    #nodes = [n for n in nodes if any(e["source"]==n["id"] or e["target"]==n["id"] for e in edges)]
+    result = {
+                "nodes": nodes,
+                "links": edges
+            } 
+    return jsonify(result), 200
+
 @app.route('/collocationsGraph', methods=['POST','GET'])
 @allow_jsonp
 @enforce_params( required=["word"] )
 def colloc_graph_post():
     word = get_param( "word" )
     word = re.sub("_[^ ]*", "", word)
+    """
+    min_freq = float(get_param( "min_freq" ))
 
-    min_freq = get_param("min_freq")
-    if min_freq is None:
-        min_freq = 0.18
+    min_link_strength = float(get_param( "min_link_str" ))
+    if min_link_strength is None:
+        min_link_strength = 0.25
+        """
+    min_freq = 0
+    min_link_strength = 0
 
     def get_other( colloc ):
         #colloc = colloc.split(" ")
@@ -310,7 +340,7 @@ def colloc_graph_post():
     }
     collocation_lists.update(c)
 
-    distance = 2
+    distance = 1
     for d in range(2,distance+1):
         # Get words in outer ring of the graph:
         source_words = set(sum([[u,v] for u,v in collocation_lists],[]))
@@ -321,21 +351,29 @@ def colloc_graph_post():
                 if w in colloc.split(" ")
             }
             collocation_lists.update(c)
-    print(collocation_lists)
-    # TODO get more distant neighbors
+    #print(collocation_lists)
 
-    #nodelist = [word] + [ get_other(colloc) for colloc in collocation_lists ]
-    #nodes = [ {"id":node,"group":1} for node in nodelist ]
     nodes = list(set(sum([[w1,w2] for w1,w2 in collocation_lists],[])))
     nodes = [ {
         "id":n,
         "group":1 if n==word else 2,
+        "def":sorted(list(dictionary[n]))[0][0] if n in dictionary else "",
         "freq":collocations["%s %s"%(n,word)] 
             if "%s %s"%(n,word) in collocations 
             else collocations["%s %s"%(word,n)]
             if "%s %s"%(word,n) in collocations 
             else 0
         } for n in nodes ]
+    # only keep common items:
+    #self_node = [ n for n in nodes if n["id"] == word ]
+    #nodes = [ n for n in nodes if n["id"] != word ]
+    #max_freq = max(n["freq"] for n in nodes)
+    #print(max_freq,min_freq)
+    #nodes = [ n for n in nodes if (n["freq"]/max_freq) >= min_freq ]
+    if len(nodes) == 0:
+        return jsonify({"nodes":[],"links":[]}), 200
+    #nodes += self_node
+    """
     edges = [ {
         "source":w1,
         "target":w2,
@@ -343,15 +381,30 @@ def colloc_graph_post():
             if "%s %s"%(w1,w2) in collocations 
             else collocations["%s %s"%(w2,w1)]
         } for (w1,w2) in collocation_lists]
-    scale = max(e["value"] for e in edges)
+    """
+    edges = [ {
+        "source":w1["id"],
+        "target":w2["id"],
+        "count":collocations["%s %s"%(w1["id"],w2["id"])] 
+            if "%s %s"%(w1["id"],w2["id"]) in collocations 
+            else collocations["%s %s"%(w2["id"],w1["id"])]
+            if "%s %s"%(w2["id"],w1["id"]) in collocations 
+            else 0
+        } for w1 in nodes for w2 in nodes ]
     for e in edges:
-        e["value"] /= scale 
-        #//e["value"] = np.sqrt(e["value"])
-    edges = [e for e in edges if e["value"] >= min_freq]
-    nodes = [n for n in nodes if any(e["source"]==n["id"] or e["target"]==n["id"] for e in edges)]
-    print(edges)
-    print(len(edges))
-    print(min_freq)
+        e["value"] = e["count"]
+        #e["value"] = np.log(e["count"])
+    #offset = min(e["value"] for e in edges if e["value"] != -np.inf)
+    # Set min to zero
+    #for e in edges:
+        #e["value"] -= offset 
+    #scale = max(e["value"] for e in edges)
+    #for e in edges:
+        #e["value"] /= scale 
+    # now all edges are in range(0,1)
+    #print(sorted(e["value"] for e in edges))
+    #edges = [e for e in edges if e["value"] >= min_link_strength]
+    #nodes = [n for n in nodes if any(e["source"]==n["id"] or e["target"]==n["id"] for e in edges) or n["id"]==word]
     result = {
                 "nodes": nodes,
                 "links": edges

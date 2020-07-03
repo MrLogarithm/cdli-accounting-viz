@@ -2482,4 +2482,6 @@ table.dataTable thead th.sorting_desc:after { content: "\f0dd"; }
 
 .search-tooltip::after { content: " "; position: absolute; bottom: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: transparent transparent rgba(0, 0, 0, 0.7) transparent; }
 
+.fdg-tooltip { border-radius: 10px; background: rgba(0, 0, 0, 0.75); color: #fff; position: absolute; right: 0; bottom: 0; }
+
 /*# sourceMappingURL=main.css.map */
