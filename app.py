@@ -40,7 +40,7 @@ app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 json_data = dict()
 last_data_load = None
-DATA_TIMEOUT = 0
+DATA_TIMEOUT = 360
 def load_static_data():
     print("Loading static data...")
     global json_data
@@ -287,21 +287,68 @@ def colloc_post():
 @allow_jsonp
 @enforce_params( required=["word"] )
 def modifier_graph_post():
-    #edges = [e for e in edges if e["value"] >= min_link_strength]
-    edges = [ {
-        "source":"a",
-        "target":"b",
-        "value":1
-    } ]
+    word = get_param( "word" )
+    word = re.sub("_[^ ]*", "", word)
+
+    nodes = [{
+                "id":modifier,
+                "group": 1,
+                "freq":len(readings),
+                "def":sorted(list(dictionary[modifier]))[0][0] 
+                      if modifier in dictionary else "",
+            }
+            for key,readings in json_data['values_by_modified_commodity'].items()
+            for modifier in re.sub("_[^ ]*", "", key).split(" ")
+            if word in key
+            #and any(r['system'] == system for rr in readings for r in rr)
+        ]
+    unique_nodes = []
+    for node in nodes:
+        if node['id'] == word or any(n["id"] == node["id"] for n in unique_nodes):
+            continue
+        unique_nodes.append(node)
+    nodes = unique_nodes
+    """
+    nodes = list(set(sum([[w1,w2] for w1,w2 in collocation_lists],[])))
     nodes = [ {
-        "id":"a",
-        "group":0,
-    },
-    {
-        "id":"b",
-        "group":1,
-    }]
-    #nodes = [n for n in nodes if any(e["source"]==n["id"] or e["target"]==n["id"] for e in edges)]
+        "id":n,
+        "group":1 if n==word else 2,
+        "def":sorted(list(dictionary[n]))[0][0] if n in dictionary else "",
+        "freq":collocations["%s %s"%(n,word)] 
+            if "%s %s"%(n,word) in collocations 
+            else collocations["%s %s"%(word,n)]
+            if "%s %s"%(word,n) in collocations 
+            else 0
+        } for n in nodes ]
+    if len(nodes) == 0:
+        return jsonify({"nodes":[],"links":[]}), 200
+    """
+    def getCombinedModCount( base, mod1, mod2 ):
+        total = 0
+        mod1 = mod1["id"] + "_MOD"
+        mod2 = mod2["id"] + "_MOD"
+        for key, counts in json_data['values_by_modified_commodity'].items():
+            if base in key and mod1 in key and mod2 in key:
+                # TODO limit to one number system, here and in other graph code
+                system = 'cardinal'
+                for count_list in counts:
+                    for count in count_list:
+                        if count['system'] == system:
+                            total += count['value']
+                            break
+        return total
+    edges = [ {
+        "source":w1["id"],
+        "target":w2["id"],
+        "count":getCombinedModCount(word,w1,w2),
+        #collocations["%s %s"%(w1["id"],w2["id"])] 
+            #if "%s %s"%(w1["id"],w2["id"]) in collocations 
+            #else collocations["%s %s"%(w2["id"],w1["id"])]
+            #if "%s %s"%(w2["id"],w1["id"]) in collocations 
+            #else 0
+        } for w1 in nodes for w2 in nodes ]
+    for e in edges:
+        e["value"] = e["count"]
     result = {
                 "nodes": nodes,
                 "links": edges
@@ -314,15 +361,6 @@ def modifier_graph_post():
 def colloc_graph_post():
     word = get_param( "word" )
     word = re.sub("_[^ ]*", "", word)
-    """
-    min_freq = float(get_param( "min_freq" ))
-
-    min_link_strength = float(get_param( "min_link_str" ))
-    if min_link_strength is None:
-        min_link_strength = 0.25
-        """
-    min_freq = 0
-    min_link_strength = 0
 
     def get_other( colloc ):
         #colloc = colloc.split(" ")
@@ -351,7 +389,6 @@ def colloc_graph_post():
                 if w in colloc.split(" ")
             }
             collocation_lists.update(c)
-    #print(collocation_lists)
 
     nodes = list(set(sum([[w1,w2] for w1,w2 in collocation_lists],[])))
     nodes = [ {
@@ -363,25 +400,11 @@ def colloc_graph_post():
             else collocations["%s %s"%(word,n)]
             if "%s %s"%(word,n) in collocations 
             else 0
-        } for n in nodes ]
-    # only keep common items:
-    #self_node = [ n for n in nodes if n["id"] == word ]
-    #nodes = [ n for n in nodes if n["id"] != word ]
-    #max_freq = max(n["freq"] for n in nodes)
-    #print(max_freq,min_freq)
-    #nodes = [ n for n in nodes if (n["freq"]/max_freq) >= min_freq ]
+        } for n in nodes 
+        if n != word
+        ]
     if len(nodes) == 0:
         return jsonify({"nodes":[],"links":[]}), 200
-    #nodes += self_node
-    """
-    edges = [ {
-        "source":w1,
-        "target":w2,
-        "value":collocations["%s %s"%(w1,w2)] 
-            if "%s %s"%(w1,w2) in collocations 
-            else collocations["%s %s"%(w2,w1)]
-        } for (w1,w2) in collocation_lists]
-    """
     edges = [ {
         "source":w1["id"],
         "target":w2["id"],
@@ -393,18 +416,6 @@ def colloc_graph_post():
         } for w1 in nodes for w2 in nodes ]
     for e in edges:
         e["value"] = e["count"]
-        #e["value"] = np.log(e["count"])
-    #offset = min(e["value"] for e in edges if e["value"] != -np.inf)
-    # Set min to zero
-    #for e in edges:
-        #e["value"] -= offset 
-    #scale = max(e["value"] for e in edges)
-    #for e in edges:
-        #e["value"] /= scale 
-    # now all edges are in range(0,1)
-    #print(sorted(e["value"] for e in edges))
-    #edges = [e for e in edges if e["value"] >= min_link_strength]
-    #nodes = [n for n in nodes if any(e["source"]==n["id"] or e["target"]==n["id"] for e in edges) or n["id"]==word]
     result = {
                 "nodes": nodes,
                 "links": edges

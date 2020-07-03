@@ -1,6 +1,5 @@
 fdg_data_colloc = undefined;
 $("#n-terms-colloc").on("input", function() {
-  draw_fdg
   draw_fdg(fdg_data_colloc, "colloc");
 });
 

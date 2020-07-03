@@ -1,3 +1,12 @@
+fdg_data_desc = undefined;
+$("#n-terms-desc").on("input", function() {
+  draw_fdg(fdg_data_desc, "desc");
+});
+
+$("#n-links-desc").on("input", function() {
+  draw_fdg(fdg_data_desc, "desc");
+});
+
 function show_modifier_list( query, system ) {
   $.ajax({
     async: false,
@@ -29,7 +38,8 @@ function show_modifier_graph( query, system ) {
     data: new URLSearchParams({"word": query,"system":system}).toString(),
     dataType: "jsonp",
     success: function( result ) {
-      draw_fdg(result, "desc");
+      fdg_data_desc = result;
+      draw_fdg(fdg_data_desc, "desc");
     },
   });
 }

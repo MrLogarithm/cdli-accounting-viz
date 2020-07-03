@@ -4,13 +4,13 @@ fdg_red = "#b3697a";
 function draw_fdg( fullData, position ) {
 
 
-  var max = parseInt($("#n-terms-colloc").prop("max"));
-  var val = parseInt($("#n-terms-colloc").val());
+  var max = parseInt($("#n-terms-"+position).prop("max"));
+  var val = parseInt($("#n-terms-"+position).val());
   var min_times_attested = (max - val) / max;
 
-  max = parseInt($("#n-links-colloc").prop("max"));
-  val = parseInt($("#n-links-colloc").val());
-  var min_link_strength  = val / max;
+  max = parseInt($("#n-links-"+position).prop("max"));
+  val = parseInt($("#n-links-"+position).val());
+  var min_link_strength  = (max - val) / max;
 
   data = {
     "nodes":fullData.nodes,
@@ -26,7 +26,11 @@ function draw_fdg( fullData, position ) {
   var max_freq = data.nodes.reduce(function(prev, current) {
     return (prev.freq >= current.freq) ? prev : current;
   }, {"freq":0}).freq;
-  data.nodes = data.nodes.filter( n => (n.freq/max_freq)  > min_times_attested );
+
+  console.log( data.nodes.filter( n=>n.id=='dur3') );
+  console.log( 1/max_freq, min_times_attested );
+  
+  data.nodes = data.nodes.filter( n => (n.freq/max_freq)  >= min_times_attested );
   data.links = data.links.filter( e => hasEndpoints( e, data.nodes ) );
   data.links = data.links.map( function(e) {
     var clone = Object.assign({}, e);
@@ -40,15 +44,13 @@ function draw_fdg( fullData, position ) {
   var max_wt = data.links.reduce(function(prev, current) {
     return (prev.value >= current.value) ? prev : current;
   }, {"value":0}).value;
-  console.log(max_wt);
   data.links = data.links.map( function(e) {
     var clone = Object.assign({}, e);
     clone.value = clone.value / max_wt;
     return clone;
   });
-  data.links = data.links.filter( e => e.value > min_link_strength );
+  data.links = data.links.filter( e => e.value >= min_link_strength );
   data.nodes = data.nodes.filter( n => hasConnection( n , data.links ) );
-  console.log("draw graph of",data.links.slice(0,5));
 
       var fdg_margin = {top: 10, right: 30, bottom: 30, left: 40},
           //fdg_width = 460 - fdg_margin.left - fdg_margin.right,
@@ -105,10 +107,10 @@ function draw_fdg( fullData, position ) {
       var simulation = d3.forceSimulation()
           .force("link", d3.forceLink()
 	    .id(function(d) { return d.id; })
-	    .strength(function(d) { return Math.pow(d.value, 2); })
+	    .strength(function(d) { return 0.1*Math.pow(d.value, 2); })
 	  )
           .force("charge", d3.forceManyBody()
-	    .strength(-30)
+	    .strength(-250)
 	  )
           /*.force("center", d3.forceCenter(150, fdg_height / 2)
 	    .strength(1)
@@ -211,7 +213,7 @@ function draw_fdg( fullData, position ) {
                 thisOpacity = isConnected(d, o) ? 1 : opacity;
                 return thisOpacity;
             });
-	    var showCliques = $("#showCliques").prop("checked");
+	    var showCliques = $("#showCliques-"+position).prop("checked");
             // also style link accordingly
             link.style("stroke-opacity", function(o) {
 	        var isCliqueEdge = showCliques && 
