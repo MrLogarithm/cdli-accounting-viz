@@ -10,47 +10,96 @@ $("#search-button").click(function(e){
   do_search();
 });
 
-function summary_stats( arr ) {
-  arr = arr.sort();
-  var sum = 0;
-  var sum_sq = 0;
-  var mode = undefined;
-  var mode_count = 0;
-  var curr_mode = undefined;
-  var curr_mode_count = 0;
-  for ( var elem of arr ) {
-    sum += elem;
-    sum_sq += elem*elem;
-    if (curr_mode === undefined) {
-      curr_mode = elem;
-    }
-    if (elem == curr_mode) {
-      curr_mode_count += 1;
-    } else {
-      if (curr_mode_count>mode_count){
-	mode = curr_mode;
-	mode_count = curr_mode_count;
+function update_summary_stats( query, system ) {
+  $.ajax({
+    async: false,
+    url: api_base_url + "/summaryStats",
+    type: "POST",
+    crossDomain: true,
+    data: new URLSearchParams({"word": query, "system": system}).toString(),
+    dataType: "jsonp",
+    success: function( result ) {
+      for (item of result) {
+	for (entry of Object.entries(item)) {
+	  var stat_name = entry[0];
+	  var value = entry[1];
+	  if ( typeof value == 'number' ) {
+	    value = Math.round(100*value)/100;
+	  }
+	  $("#"+stat_name).html( value );
+	}
       }
-      curr_mode = elem;
-      curr_mode_count = 1;
-    }
-  }
-  var mean = sum/arr.length;
-  var variance = (sum_sq/arr.length) + ((sum*sum)/(arr.length*arr.length));
-  return {
-    'mean':Math.round(100*mean)/100,
-    'median':Math.round(
-      100*arr[Math.round(arr.length/2)]
-    )/100,
-    'mode':Math.round(100*mode)/100,
-    "stdev":Math.round(100*Math.sqrt(variance))/100,
-  };
+    },
+  });
+}
+
+function redraw_main_histogram( query ) {
+  $.ajax({
+    async: false,
+    url: api_base_url + "/getNumberSystems",
+    type: "POST",
+    crossDomain: true,
+    data: new URLSearchParams({"word": query}).toString(),
+    dataType: "jsonp",
+    success: function( result ) {
+      /* Add radio buttons for filtering histogram: */
+      $('#histogram-radio').empty();
+      
+      var radio_template = `
+        <div class="form-check">
+          <input class="form-check-input hist-select"
+                 type="radio"
+	         name="histogram-radio"
+	         id="radio_BUTTON_LABEL" 
+		 value='BUTTON_LABEL'
+		 CHECK />
+          <label class="form-check-label"
+               for="radio_BUTTON_LABEL">
+          BUTTON_LABEL
+        </label>
+      </div>`
+
+      for (label of result) {
+	if (label == "unknown")
+	  continue;
+        $('#histogram-radio').append(
+          radio_template.replace(/BUTTON_LABEL/g, label)
+        );
+      }
+
+      $('.hist-select').change(function(){
+	if ( this.checked ) {
+	  // update histogram
+	  //console.log("redrawing histogram with system",this.value);
+          
+	  draw_histogram( query, this.value );
+          update_summary_stats( query, this.value );
+          
+	  show_modifier_list( query, this.value );
+	  show_modifier_graph( query, this.value );
+
+          show_colloc_list( query, this.value );
+	  show_colloc_graph( query, this.value );
+          
+	  show_concordance( query, this.value );
+
+	  draw_all_similarity( query, this.value );
+	}
+      });
+
+      // click the first button to prompt a redraw:
+      $('.hist-select').first().click();
+    
+    },
+  });
 }
 
 /* If the search term is in the dataset, 
  * redraw the figures and update the page.
  */
 function do_search() {
+  $('#loading-indicator').show();
+  
   query = $("#search-input").val();
 
   // TODO handle modifiers and number system filters
@@ -58,45 +107,7 @@ function do_search() {
   if ( json_data.all_objects.includes(query) ) {
     set_header( query );
 
-    /* Get total number of instances: */
-    var counts = json_data.counts_by_commodity[ labeled_query ];
-    var n_instances = 0;
-    Object.keys(counts).forEach(function(key){
-      n_instances += counts[key];
-    });
-    $("#label-total-entries").html( n_instances );
-
-    /* Get total value of counted objects: */
-    var values = json_data.values_by_commodity[ labeled_query ];
-    var total_values = {};
-    var values_by_system = {}
-    var units = {};
-    values.forEach(function(readings) {
-      readings.forEach(function(reading) {
-	if (! total_values.hasOwnProperty(reading.system)) {
-	  total_values[reading.system] = 0;
-	  values_by_system[reading.system] = [];
-	  units[reading.system] = reading.unit;
-	}
-	if (reading.value != "none" ) {
-	  total_values[reading.system] += reading.value;
-	  values_by_system[reading.system].push( reading.value );
-	}
-      });
-    });
-    // TODO get this from the radio buttons
-    var system = "cardinal";
-    hist_data = values_by_system[system].map(x => Object({value:x}));
-    draw_histogram( hist_data );
-    //console.log(total_values);
-    $("#label-total-value").html( Math.round(total_values[system]) + " " + units[system] );
-
-    var stats = summary_stats( values_by_system[system] );
-    $("#mean").html( stats['mean'] );
-    $("#median").html( stats['median'] );
-    $("#mode").html( stats['mode'] );
-    $("#stdev").html( stats['stdev'] );
-    // TODO redraw radio buttons based on observed counts
+    redraw_main_histogram( labeled_query );
   } else {
     /* Show "Word not recognized" tooltip */
     $('.search-tooltip').css("opacity",1);
@@ -104,6 +115,7 @@ function do_search() {
       $('.search-tooltip').css("opacity",0);
     }, 1500);
   }
+    $('#loading-indicator').hide();
 }
 
 /* Set the header above the main histogram
@@ -113,7 +125,8 @@ function do_search() {
 function set_header( query ) {
   $('#histogram-header').html(query);
   if ( json_data.dictionary.hasOwnProperty(query) ) {
-    var definition = json_data.dictionary[query];
+    console.log(json_data.dictionary);
+    var definition = json_data.dictionary[query].join(", ");
     $('#translation').html( "[" + definition + "]" );
   } else {
     $('#translation').html();

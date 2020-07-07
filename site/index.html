@@ -49,16 +49,18 @@
     <!--
       <img class='card-img-top bg-white' style='width:100%;height:300px;' src='' alt='histogram'>
     -->
-    <div id='histogram-radio' class="radio-float py-1 px-2">
-      <span class='float-left text-secondary'>Fewer bins</span>
-      <span class='float-right text-secondary'>More bins</span><br/>
+    <div class="radio-float py-1 px-2">
+      <span class='float-left text-secondary'>Fewer<br/>bins</span>
+      <span class='float-right text-secondary text-right'>More<br/>bins</span><br/>
       <input type="range" min="1" max="150" step="5" value="40" id="n-bins-histogram">
+      <div id='histogram-radio'>
+      </div>
     </div>
     </div>
 
     <div class='card-footer bg-white'>
-      <div class="row">
-	<div class='col-md-12'><b id='label-total-value'>m</b> counted across <b id='label-total-entries'>n</b> entries</div>
+      <div class="row text-center mb-2">
+	<div class='col-md-12'><b id='sum'>m</b><b id='sum-unit'></b> counted across <b id='n-instances'>n</b> entries</div>
       </div>
       <div class="row">
 	<div class='col-md-6'>
@@ -96,6 +98,22 @@
 	      <span id='stdev'>0</span><br/>
 	    </div>
 	  </div>
+	  <div class='row'>
+	    <div class='col-md-6'>
+	      skewness:
+	    </div>
+	    <div class='col-md-6'>
+	      <span id='skewness'>0</span><br/>
+	    </div>
+	  </div>
+	  <div class='row'>
+	    <div class='col-md-6'>
+	      kurtosis:
+	    </div>
+	    <div class='col-md-6'>
+	      <span id='kurtosis'>0</span><br/>
+	    </div>
+	  </div>
 	</div>
       </div>
     </div>
@@ -117,34 +135,7 @@
 	Reduced
       </span>
     </div>
-    <div class='card-body card-content-scroll'>
-      <div class='row mb-2'>
-	<div class='col-3 align-self-center'>
-	  udu
-	</div>
-	<div class='col-9 align-self-center'>
-          <img class='bg-white similarity-reduced' style='width:100%;height:120px;' src='' alt='reduced comparison'>
-          <img class='bg-white similarity-full d-none' style='width:100%;height:120px;' src='' alt='full comparison'>
-	</div>
-      </div>
-      <div class='row mb-2'>
-	<div class='col-3 align-self-center'>
-	  sila4
-	</div>
-	<div class='col-9 align-self-center'>
-          <img class='bg-white similarity-reduced' style='width:100%;height:120px;' src='' alt='reduced comparison'>
-          <img class='bg-white similarity-full d-none' style='width:100%;height:120px;' src='' alt='full comparison'>
-	</div>
-      </div>
-      <div class='row mb-2'>
-	<div class='col-3 align-self-center'>
-	  ud5
-	</div>
-	<div class='col-9 align-self-center'>
-          <img class='bg-white similarity-reduced' style='width:100%;height:120px;' src='' alt='reduced comparison'>
-          <img class='bg-white similarity-full d-none' style='width:100%;height:120px;' src='' alt='full comparison'>
-	</div>
-      </div>
+    <div class='card-body card-content-scroll' id='similarity-div'>
     </div>
   </div>
   
@@ -164,41 +155,6 @@
         </tr>
 	</thead>
 	<tbody>
-        <tr>
-	  <td>1(u) masz nita</td>
-	  <td>10</td>
-	  <td>3</td>
-        </tr>
-        <tr>
-	  <td>2(asz) masz nita</td>
-	  <td>2</td>
-	  <td>1</td>
-        </tr>
-        <tr>
-	  <td>5(asz) masz nita</td>
-	  <td>5</td>
-	  <td>2</td>
-        </tr>
-        <tr>
-	  <td>5(asz) masz nita</td>
-	  <td>5</td>
-	  <td>2</td>
-        </tr>
-        <tr>
-	  <td>5(asz) masz nita</td>
-	  <td>5</td>
-	  <td>2</td>
-        </tr>
-        <tr>
-	  <td>5(asz) masz nita</td>
-	  <td>5</td>
-	  <td>2</td>
-        </tr>
-        <tr>
-	  <td>5(asz) masz nita</td>
-	  <td>5</td>
-	  <td>2</td>
-        </tr>
 	</tbody>
       </table>
     </div>
@@ -221,12 +177,26 @@
       </span>
     </div>
 
-    <div id='graph-nearby-div' class='d-none'>
-      <img class='bg-white' style='width:100%;height:300px;' src='' alt='force directed graph'>
+    <div id='graph-div-colloc' class='d-none'>
+      <div class='radio-float py-1 px-2'>
+        <span class='float-left text-secondary'>Common<br/>words only</span>
+        <span class='float-right text-secondary text-right'>All<br/>words</span><br/>
+	<input type="range" min="0" max="100" step="1" value="99" id="n-terms-colloc"><br/>
+	<span class='float-right text-right text-secondary'>All<br/>links</span>
+	<span class='float-left text-secondary'>Strong<br/>collocations only</span>
+	<br/>
+	<input type="range" min="0" max="100" step="1" value="25" id="n-links-colloc"><br/>
+	<div class="input-group float-right">
+	  <input type="checkbox" class="" id="showCliques-colloc">
+          <label class="p-2 mt-2" for="showCliques-colloc">Highlight cliques?</label>
+        </div>
+      </div>
+      <div id='tooltip-colloc' class='fdg-tooltip m-2 p-1 d-none'>
+      </div>
     </div>
 
     
-    <div id='table-nearby-div' class='card-content-scroll'>
+    <div id='table-div-colloc' class='card-content-scroll'>
       <table id='table-nearby' class='table table-striped'>
 	<thead class='frozen'>
         <tr>
@@ -237,26 +207,6 @@
         </tr>
 	</thead>
 	<tbody>
-        <tr>
-	  <td>udu</td>
-	  <td>3</td>
-        </tr>
-        <tr>
-	  <td>sila4</td>
-	  <td>2</td>
-        </tr>
-        <tr>
-	  <td>ziz2</td>
-	  <td>3</td>
-        </tr>
-        <tr>
-	  <td>kasz</td>
-	  <td>1</td>
-        </tr>
-        <tr>
-	  <td>sze</td>
-	  <td>5</td>
-        </tr>
 	</tbody>
       </table>
     </div>
@@ -280,11 +230,25 @@
       </span>
     </div>
 
-    <div id='graph-desc-div' class='d-none'>
-      <img class='bg-white' style='width:100%;height:300px;' src='' alt='force directed graph'>
+    <div id='graph-div-desc' class='d-none'>
+      <div class='radio-float py-1 px-2'>
+        <span class='float-left text-secondary'>Common<br/>words only</span>
+        <span class='float-right text-secondary text-right'>All<br/>words</span><br/>
+	<input type="range" min="0" max="100" step="1" value="99" id="n-terms-desc"><br/>
+	<span class='float-right text-secondary text-right'>All<br/>links</span>
+	<span class='float-left text-secondary'>Strong<br/>collocations only</span>
+	<br/>
+	<input type="range" min="0" max="100" step="1" value="25" id="n-links-desc"><br/>
+	<div class="input-group float-right">
+	  <input type="checkbox" class="" id="showCliques-desc">
+          <label class="p-2 mt-2" for="showCliques-desc">Highlight cliques?</label>
+        </div>
+      </div>
+      <div id='tooltip-desc' class='fdg-tooltip m-2 p-1 d-none'>
+      </div>
     </div>
 
-    <div id='table-desc-div' class='card-content-scroll'>
+    <div id='table-div-desc' class='card-content-scroll'>
       <table id='table-desc' class='table table-striped'>
 	<thead class='frozen'>
         <tr>
@@ -294,27 +258,7 @@
 	  <div>
         </tr>
 	</thead>
-	<tbody>
-        <tr>
-	  <td><span class='text-secondary'>none</span></td>
-	  <td>3</td>
-        </tr>
-        <tr>
-	  <td>bar-dul5</td>
-	  <td>2</td>
-        </tr>
-        <tr>
-	  <td>babbar2 bar-dul5</td>
-	  <td>3</td>
-        </tr>
-        <tr>
-	  <td>nita</td>
-	  <td>1</td>
-        </tr>
-        <tr>
-	  <td>im-ma</td>
-	  <td>5</td>
-        </tr>
+	<tbody id='tbody-modifiers'>
 	</tbody>
       </table>
     </div>
@@ -327,8 +271,18 @@
 <script src="/cdli-accounting-viz/assets/js/init.js"></script>
 <!-- Search -->
 <script src="/cdli-accounting-viz/assets/js/search.js"></script>
-<!-- Search -->
+<!-- Histogram -->
 <script src="/cdli-accounting-viz/assets/js/histogram.js"></script>
+<!-- Force-Directed Graphs -->
+<script src="/cdli-accounting-viz/assets/js/fdg.js"></script>
+<!-- List of Modifiers -->
+<script src="/cdli-accounting-viz/assets/js/modifiers.js"></script>
+<!-- List of Collocations -->
+<script src="/cdli-accounting-viz/assets/js/collocations.js"></script>
+<!-- Concordance -->
+<script src="/cdli-accounting-viz/assets/js/concordance.js"></script>
+<!-- Similar Words -->
+<script src="/cdli-accounting-viz/assets/js/similar.js"></script>
 
     </div>
     <!-- Speed up loading by fetching fontawesome asynchronously -->

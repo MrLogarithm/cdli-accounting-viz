@@ -2467,9 +2467,9 @@ table.dataTable thead th.sorting_desc:after { content: "\f0dd"; }
 .frozen { position: sticky; top: 0; background: #fff; }
 
 /* Fix card size and add scrollbars: */
-.card-scroll { max-height: 440px; }
+.card-scroll { /*height: $max-card-height;*/ /*resize: vertical;*/ }
 
-.card-content-scroll { max-height: 350px; overflow-y: scroll; }
+.card-content-scroll { height: 350px; resize: vertical; overflow-y: scroll; }
 
 .radio-float { position: absolute; top: 72px; right: 0px; }
 
@@ -2481,5 +2481,7 @@ table.dataTable thead th.sorting_desc:after { content: "\f0dd"; }
 .search-tooltip { opacity: 0; background: rgba(0, 0, 0, 0.7); color: #fff; border-radius: 10px; position: absolute; top: 52px; left: 19px; z-index: 2; transition: opacity 0.5s; }
 
 .search-tooltip::after { content: " "; position: absolute; bottom: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: transparent transparent rgba(0, 0, 0, 0.7) transparent; }
+
+.fdg-tooltip { border-radius: 10px; background: rgba(0, 0, 0, 0.75); color: #fff; position: absolute; right: 0; bottom: 0; }
 
 /*# sourceMappingURL=main.css.map */

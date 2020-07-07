@@ -1,3 +1,5 @@
+api_base_url = "https://cdli-numerals.herokuapp.com" /*"http://localhost:5000"*/;
+
 /* Make tables sortable: */
 table_format = {
   sDom:"frt",
@@ -6,6 +8,7 @@ table_format = {
     search:"",
     searchPlaceholder:'Filter'
   },
+  paging: false,
 }; 
 // r: pRocessing (show spinner when working)
 // t: show Table
@@ -13,49 +16,48 @@ $("#table-nearby").DataTable(table_format);
 $("#table-desc").DataTable(table_format);
 // This table should be ordered by column 2:
 table_format.order[0][0] = 2;
+table_format.columns = [
+  {type:"string"},
+  {type:"num"},
+  {type:"num"},
+];
 $("#table-concordance").DataTable(table_format);
 
 
 
 /* Setup toggles for force directed graphs: */
 $('#toggle-nearby').click(function() {
-  $('#graph-nearby-div').toggleClass('d-none');
-  $('#table-nearby-div').toggleClass('d-none');
+  $('#graph-div-colloc').toggleClass('d-none');
+  $('#table-div-colloc').toggleClass('d-none');
 });
 $('#toggle-desc').click(function() {
-  $('#graph-desc-div').toggleClass('d-none');
-  $('#table-desc-div').toggleClass('d-none');
+  $('#graph-div-desc').toggleClass('d-none');
+  $('#table-div-desc').toggleClass('d-none');
 });
 $('#toggle-delta').click(function() {
   $('.similarity-reduced').toggleClass('d-none');
   $('.similarity-full').toggleClass('d-none');
 });
 
-
-
-/* Add radio buttons for filtering histogram: */
-var radio_labels = [
-  "Area",
-  "Cardinal",
-  "Capacity",
-  "Length",
-];
-var radio_template = `
-  <div class="form-check">
-    <input class="form-check-input"
-           type="radio"
-	     name="histogram-radio"
-	     id="radio_BUTTON_LABEL" />
-    <label class="form-check-label"
-           for="radio_BUTTON_LABEL">
-      BUTTON_LABEL
-    </label>
-  </div>`
-for (label of radio_labels) {
-  $('#histogram-radio').append(
-    radio_template.replace(/BUTTON_LABEL/g, label)
-  );
+/* Disable mousewheel when over figures: */
+// https://stackoverflow.com/questions/7571370/jquery-disable-scroll-when-mouse-over-an-absolute-div
+$('#graph-nearby-div').hover(function() {
+    $(document).bind('mousewheel DOMMouseScroll',function(){ 
+        stopWheel(); 
+    });
+}, function() {
+    $(document).unbind('mousewheel DOMMouseScroll');
+});
+function stopWheel(e){
+    if(!e){ /* IE7, IE8, Chrome, Safari */
+        e = window.event;
+    }
+    if(e.preventDefault) { /* Chrome, Safari, Firefox */
+        e.preventDefault();
+    }
+    e.returnValue = false; /* IE7, IE8 */
 }
+
 
 json_data = {};
 /* Fetch data: */
@@ -65,7 +67,7 @@ $(document).ready(function(){
     dataType: "json",
     url: data_url,
     success: function( result ) {
-	console.log( result );
+	console.log( "Got JSON data:", result );
 	json_data = result;
   	$('#search-input').val("kusz");
   	do_search();
