@@ -395,7 +395,7 @@ def commodify_whole_corpus():
                         collocation_counts[ key ] += 1
     all_objects = sorted(list([re.sub('_[A-Z]{3}', '', k) for k in counts_by_commodity.keys()]))
     output_dictionary = {
-            word:list(def_ for def_,pos in dictionary[word] if pos=="NN")
+            word:list(def_ for def_,pos in dictionary[word])
             for word in all_objects
             if len(dictionary[word]) > 0
         }
