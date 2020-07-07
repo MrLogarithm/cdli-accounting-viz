@@ -400,9 +400,9 @@ def colloc_graph_post():
         "id":n,
         "group":1 if n==word else 2,
         #"def":sorted(list(dictionary[n]))[0][0] if n in dictionary else "",
-        "defs":list(def_ for def_,pos in dictionary[modifier] if pos == 'NN')
+        "defs":list(def_ for def_,pos in dictionary[n] if pos == 'NN')
         #sorted(list(def_ for def_,pos in dictionary[modifier] if pos == 'NN'))[0] 
-                if modifier in dictionary else "",
+                if n in dictionary else "",
         "freq":collocations["%s %s"%(n,word)] 
             if "%s %s"%(n,word) in collocations 
             else collocations["%s %s"%(word,n)]
@@ -526,13 +526,13 @@ def similar_post():
             "distribution":[{
                 "index":i,
                 "value":100*v,
-                "label":"%d%%"%(int(100*v)),
+                "label":"%.1f%%"%(100*v),
                 "bin":"%d-%d"%(i*range_/n_bins,(i+1)*range_/n_bins),
             } for i,v in enumerate(q)],
             "delta":[{
                 "index":i,
                 "value":100*v,
-                "label":"%+d%%"%(int(100*v)),
+                "label":"%+.1f%%"%(100*v),
                 "bin":"%d-%d"%(i*range_/n_bins,(i+1)*range_/n_bins),
             } for i,v in enumerate(delta)],
             } for (sim, w, q, delta) in list(sorted(similarities))[1:6]]

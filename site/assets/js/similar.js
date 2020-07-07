@@ -16,8 +16,9 @@ function draw_one_similarity( word, delta, distribution ) {
     .attr("class", "col-2 align-self-center")
     .html(word)
   ;
+  var id = new Date().getTime();
   var svg_div = row.append("div")
-    .attr("class", "col-10 align-self-center div-sim-"+word)
+    .attr("class", "col-10 align-self-center div-sim-"+id)
   ;
   var svg_delta = svg_div.append("svg")
     .attr("class", "bg-white similarity-reduced")
@@ -53,7 +54,7 @@ function draw_one_similarity( word, delta, distribution ) {
       .range([0, sim_width])
     ;
 
-  var tooltip = d3.selectAll(".div-sim-"+word)
+  var tooltip = d3.selectAll(".div-sim-"+id)
     .append("div")
     .style("opacity", 0)
     .attr("class", "tooltip")
