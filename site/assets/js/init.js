@@ -1,4 +1,4 @@
-api_base_url = "http://localhost:5000";
+api_base_url = "https://cdli-numerals.herokuapp.com" /*"http://localhost:5000"*/;
 
 /* Make tables sortable: */
 table_format = {
@@ -67,7 +67,7 @@ $(document).ready(function(){
     dataType: "json",
     url: data_url,
     success: function( result ) {
-	console.log( result );
+	console.log( "Got JSON data:", result );
 	json_data = result;
   	$('#search-input').val("kusz");
   	do_search();
