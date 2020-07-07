@@ -18,7 +18,7 @@ function draw_histogram( query, system ) {
     dataType: "jsonp",
     success: function( result ) {
 
-      data = result;
+      hist_data = result;
 
   d3.select("#histogram-main").select("svg").remove();
   var svg = d3.select("#histogram-main")
@@ -29,7 +29,7 @@ function draw_histogram( query, system ) {
       .attr("transform",
             "translate(" + hist_margin.left + "," + hist_margin.top + ")");
 
-  hist_max = d3.max(data, d => +d.value);
+  hist_max = d3.max(hist_data, d => +d.value);
 
   // X axis: scale and draw:
   var x = d3.scaleLinear()
@@ -54,7 +54,7 @@ function draw_histogram( query, system ) {
         .thresholds(x.ticks(nBin)); // then the numbers of bins
 
     // And apply this function to data to get the bins
-    var bins = histogram(data);
+    var bins = histogram(hist_data);
 
     // Y axis: update now that we know the domain
     y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously

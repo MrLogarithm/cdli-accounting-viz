@@ -1,6 +1,3 @@
-global_query = undefined;
-global_system = undefined;
-
 /* Trigger search function when the user
  * presses Enter or clicks the search button:
  */
@@ -74,7 +71,6 @@ function redraw_main_histogram( query ) {
 	if ( this.checked ) {
 	  // update histogram
 	  //console.log("redrawing histogram with system",this.value);
-	  global_system = this.value;
           
 	  draw_histogram( query, this.value );
           update_summary_stats( query, this.value );
@@ -86,6 +82,8 @@ function redraw_main_histogram( query ) {
 	  show_colloc_graph( query, this.value );
           
 	  show_concordance( query, this.value );
+
+	  draw_all_similarity( query, this.value );
 	}
       });
 
@@ -100,8 +98,9 @@ function redraw_main_histogram( query ) {
  * redraw the figures and update the page.
  */
 function do_search() {
+  $('#loading-indicator').show();
+  
   query = $("#search-input").val();
-  global_query = query;
 
   // TODO handle modifiers and number system filters
   labeled_query = query + "_COM";
@@ -116,6 +115,7 @@ function do_search() {
       $('.search-tooltip').css("opacity",0);
     }, 1500);
   }
+    $('#loading-indicator').hide();
 }
 
 /* Set the header above the main histogram
@@ -125,7 +125,8 @@ function do_search() {
 function set_header( query ) {
   $('#histogram-header').html(query);
   if ( json_data.dictionary.hasOwnProperty(query) ) {
-    var definition = json_data.dictionary[query];
+    console.log(json_data.dictionary);
+    var definition = json_data.dictionary[query].join(", ");
     $('#translation').html( "[" + definition + "]" );
   } else {
     $('#translation').html();

@@ -225,8 +225,8 @@ function draw_fdg( fullData, position ) {
 		    (isConnected( o.source, d ) && isConnected(o.target, d) );
                 return o.source.id === d.id || o.target.id === d.id || isCliqueEdge ? o.source.colour : "#ddd";
             });
-	    $("#"+tooltipID).html( d.def );
-	    if (d.def != "")
+	    $("#"+tooltipID).html( d.defs.join(", ") );
+	    if (d.defs.length != 0)
 	      $("#"+tooltipID).removeClass("d-none");
         };
     }

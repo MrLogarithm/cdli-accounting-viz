@@ -289,12 +289,17 @@ def colloc_post():
 def modifier_graph_post():
     word = get_param( "word" )
     word = re.sub("_[^ ]*", "", word)
-
+    
+    for key,readings in json_data['values_by_modified_commodity'].items():
+        for modifier in re.sub("_[^ ]*", "", key).split(" "):
+            if word in key and modifier in dictionary:
+                print()
     nodes = [{
                 "id":modifier,
                 "group": 1,
                 "freq":len(readings),
-                "def":sorted(list(dictionary[modifier]))[0][0] 
+                "defs":list(def_ for def_,pos in dictionary[modifier] if pos == 'NN')
+                #sorted(list(def_ for def_,pos in dictionary[modifier] if pos == 'NN'))[0] 
                       if modifier in dictionary else "",
             }
             for key,readings in json_data['values_by_modified_commodity'].items()
@@ -394,7 +399,10 @@ def colloc_graph_post():
     nodes = [ {
         "id":n,
         "group":1 if n==word else 2,
-        "def":sorted(list(dictionary[n]))[0][0] if n in dictionary else "",
+        #"def":sorted(list(dictionary[n]))[0][0] if n in dictionary else "",
+        "defs":list(def_ for def_,pos in dictionary[modifier] if pos == 'NN')
+        #sorted(list(def_ for def_,pos in dictionary[modifier] if pos == 'NN'))[0] 
+                if modifier in dictionary else "",
         "freq":collocations["%s %s"%(n,word)] 
             if "%s %s"%(n,word) in collocations 
             else collocations["%s %s"%(word,n)]
@@ -466,6 +474,69 @@ def modifiers_post():
             ]
     return jsonify(result), 200
 
+
+@app.route('/similar', methods=['POST','GET'])
+@allow_jsonp
+@enforce_params( required=["word","system"] )
+def similar_post():
+    word = get_param( "word" )
+    system = get_param( "system" )
+
+    n_bins = 10
+    def get_distribution( w, s, range_=None ):
+        if range_ == 0:
+            return [], 0
+        d = []
+        for lst in json_data['values_by_commodity'][w]:
+            for reading in lst:
+                if reading["system"] == s:
+                    d.append( reading["value"] )
+        if d == []:
+            return [], 0
+        # bin data and convert to probabilities:
+        if range_ is None:
+          range_ = max(d)+1
+        bins = np.array([0.0 for _ in range(n_bins)])
+        for point in d:
+            idx = int(n_bins*point/range_)
+            if idx < len(bins):
+              bins[ idx ] += 1
+        bins += 1e-10
+        p = bins / bins.sum()
+        return p, range_
+
+    def kl_divergence(p, q):
+        return np.sum(np.where(p != 0, p * np.log(p / q), 0))
+
+    p, range_ = get_distribution( word, system )
+
+    similarities = []
+    for w in json_data['values_by_commodity']:
+        q, _ = get_distribution( w, system, range_ )
+        if q == []:
+            continue
+        divergence = kl_divergence( p, q )
+        delta = q-p
+        similarities.append( (divergence, w, q, delta) )
+    print( sorted(similarities) )
+    return jsonify({"similarities":
+        [{
+            "divergence":sim,
+            "word":re.sub("_[^ ]*", "", w),
+            "distribution":[{
+                "index":i,
+                "value":100*v,
+                "label":"%d%%"%(int(100*v)),
+                "bin":"%d-%d"%(i*range_/n_bins,(i+1)*range_/n_bins),
+            } for i,v in enumerate(q)],
+            "delta":[{
+                "index":i,
+                "value":100*v,
+                "label":"%+d%%"%(int(100*v)),
+                "bin":"%d-%d"%(i*range_/n_bins,(i+1)*range_/n_bins),
+            } for i,v in enumerate(delta)],
+            } for (sim, w, q, delta) in list(sorted(similarities))[1:6]]
+    }), 200
 
 ##################################################
 # Serve JSON from file:

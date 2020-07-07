@@ -2467,9 +2467,9 @@ table.dataTable thead th.sorting_desc:after { content: "\f0dd"; }
 .frozen { position: sticky; top: 0; background: #fff; }
 
 /* Fix card size and add scrollbars: */
-.card-scroll { max-height: 440px; }
+.card-scroll { /*height: $max-card-height;*/ /*resize: vertical;*/ }
 
-.card-content-scroll { max-height: 350px; overflow-y: scroll; }
+.card-content-scroll { height: 350px; resize: vertical; overflow-y: scroll; }
 
 .radio-float { position: absolute; top: 72px; right: 0px; }
 
