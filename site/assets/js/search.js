@@ -104,6 +104,7 @@ function do_search() {
 
   // TODO handle modifiers and number system filters
   labeled_query = query + "_COM";
+  console.log(query, json_data.all_objects);
   if ( json_data.all_objects.includes(query) ) {
     set_header( query );
 
