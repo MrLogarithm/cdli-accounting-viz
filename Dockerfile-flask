@@ -1,0 +1,50 @@
+# alpine is the smallest image I've found
+# that supports all required python packages
+FROM alpine:3.12.0
+
+# Install python packages:
+RUN apk add --no-cache python3-dev 
+RUN apk add --no-cache py3-pip 
+RUN apk add --no-cache py3-regex
+RUN apk add --no-cache py3-numpy
+RUN apk add --no-cache py3-scipy
+RUN apk add --no-cache py3-mysqlclient
+
+# numpy installs to a different location than other packages:
+ENV PYTHONPATH=/usr/lib/python3.8/site-packages
+
+# Upgrade pip:
+RUN pip3 install --upgrade pip
+# Copy and install requirements with pip:
+COPY ./requirements.txt /tmp/
+RUN pip3 install -r /tmp/requirements.txt
+
+# Install wordnet now in case of network
+# issues when the container is running:
+RUN mkdir -p /usr/nltk_data/corpora
+WORKDIR /usr/nltk_data/corpora
+RUN wget https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip
+RUN unzip -x wordnet.zip
+RUN rm wordnet.zip
+
+# Copy flask API and accompanying code to image:
+RUN mkdir /cdli-commodity-viz
+COPY ./code /cdli-commodity-viz/code
+
+# Clean unnecessary files:
+RUN rm -rf /cdli-commodity-viz/code/site*
+
+# Extract compressed data:
+WORKDIR /cdli-commodity-viz/code/data/
+RUN tar xvf commodities.tar.gz
+RUN rm commodities.tar.gz
+
+# Run flask in code directory
+WORKDIR /cdli-commodity-viz/code/
+
+# Expose a port to access the API:
+EXPOSE 8088
+
+# Run `python3 main.py`
+ENTRYPOINT ["python3"]
+CMD ["main.py"]

@@ -1,0 +1,1117 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a set of simple tools for working with cuneiform numeric notations. Included are utilities for converting cuneiform numerals to Arabic notation, checking whether a string is parsable as a number, and querying the counted objects in a text.",
+    "version": "1.0.1",
+    "title": "CDLI Numeral Conversion"
+  },
+  "host": "127.0.0.1:8087",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "convert",
+      "description": "Convert Sumerian numerals to Arabic notation:"
+    },
+    {
+      "name": "canparse",
+      "description": "Test whether a string can be parsed as a numeral:"
+    },
+    {
+      "name": "static files",
+      "description": "Serve static, precomputed data:"
+    },
+    {
+      "name": "visualize",
+      "description": "API endpoints for use in vosualization:"
+    },
+    {
+      "name": "commodify",
+      "description": "Find counted objects in a text:"
+    }
+  ],
+  "paths": {
+    "/commodifyAll": {
+      "post": {
+        "tags": [
+          "commodify"
+        ],
+        "summary": "Returns all extracted information about commodities and numbers in a corpus.",
+        "description": "",
+        "operationId": "commodify_all_post",
+        "consumes": [],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns a JSON object listing all of the commodity information extracted from the corpus.",
+            "schema": {
+              "$ref": "#/definitions/CommodifyAllResult"
+            }
+          }
+        }
+      }
+    },
+    "/getNumberSystems": {
+      "post": {
+        "tags": ["visualize"],
+        "summary": "Given a word, lists the number systems with which that word is counted.",
+        "description": "",
+        "operationId": "number_systems_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "query"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The word to consider."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of number systems which can be used to count this item.",
+            "schema": {
+              "$ref": "#/definitions/NumberSystemsResult"
+            }
+          }
+        }
+      }
+    },
+    "/summaryStats": {
+      "post": {
+        "tags": ["visualize"],
+        "summary": "Given a word, returns a collection of statistics describing the distribution of counts associated with that word.",
+        "description": "",
+        "operationId": "stats_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "query",
+                "system"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The word to consider."
+                },
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "date",
+                    "cardinal",
+                    "length",
+                    "surface",
+                    "volume",
+                    "dry capacity",
+                    "liquid capacity",
+                    "weight",
+                    "bricks"
+                  ],
+                  "description": "The number system to describe. Counts which are not written in this system will be excluded when computing the statistics."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A collection of statistics describing the distribution of counts associated with this item. \n  - n-instances: number of entries which record this item\n  - sum: sum of all counts recording this item \n  - sum-unit: unit used to compute the sum\n  - mean: mean of counts used with this item\n  - variance: variance of counts used with this item\n  - stdev: standard deviation of counts used with this item\n  - skewness: skewness of counts used with this item\n  - kurtosis: kurtosis of counts used with this item\n  - gmean: geometric mean of counts used with this item\n  - hmean: harmonic mean of counts used with this item\n  - median: median of counts used with this item\n  - mode: most common count used with this item",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/StatsResult"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collocations": {
+      "post": {
+        "tags": ["visualize"],
+        "summary": "Given a word, returns a list of commodities which can occur in the same tablet as that word.",
+        "description": "",
+        "operationId": "colloc_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "query"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The word to consider."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of objects listing the words which occur in tablets alongside the query term, and how often they occur together.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "term": {
+                    "type": "string"
+                  },
+                  "count": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modifiersGraph": {
+      "post": {
+        "tags": ["visualize"],
+        "summary": "Given a word, returns a graph of all adjectives and other modifiers used to describe that word.",
+        "description": "",
+        "operationId": "modifier_graph_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "query"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The word to consider."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A graph where nodes represent modifier words and edges record how often a pair of modifiers are used together.",
+            "schema": {
+              "$ref": "#/definitions/Graph"
+            }
+          }
+        }
+      }
+    },
+    "/collocationsGraph": {
+      "post": {
+        "tags": ["visualize"],
+        "summary": "Given a word, returns a graph of all commodities which can occur in the same tablet as that word.",
+        "description": "",
+        "operationId": "colloc_graph_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "query"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The word to consider."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A graph where nodes represent commodities and edges record how often a pair of commodities occur in a tablet together.",
+            "schema": {
+              "$ref": "#/definitions/Graph"
+            }
+          }
+        }
+      }
+    },
+    "/allValues": {
+      "post": {
+        "tags": ["visualize"],
+        "summary": "Given a word and a number system, returns a list of all numbers used to count that word, as evaluated using the specified system. If the object is counted with more than one number system, counts which can't be interpreted using the chosen system will be ignored.",
+        "description": "",
+        "operationId": "values_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "query",
+		"system"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The word to consider."
+                },
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "date",
+                    "cardinal",
+                    "length",
+                    "surface",
+                    "volume",
+                    "dry capacity",
+                    "liquid capacity",
+                    "weight",
+                    "bricks"
+                  ],
+                  "description": "The number system to use when evaluating the numerals."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array containing the value of every number used to count the query object.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number"
+                  },
+                  "unit": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/concordance": {
+      "post": {
+        "tags": ["visualize"],
+        "summary": "Given a word and a number system, returns a list of all lines in the corpus which contain the specified word counted using the specified number system.",
+        "description": "",
+        "operationId": "concordance_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "query",
+                "system"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The word to consider."
+                },
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "date",
+                    "cardinal",
+                    "length",
+                    "surface",
+                    "volume",
+                    "dry capacity",
+                    "liquid capacity",
+                    "weight",
+                    "bricks"
+                  ],
+                  "description": "The number system to use for filtering the results."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array listing lines which contain the input word counted using the specified system. Each line is accompanied by the value, in modern notation, of the associated count, and the number of times that line occurs in the corpus.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "line": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "number"
+                  },
+                  "count": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modifiers": {
+      "post": {
+        "tags": ["visualize"],
+        "summary": "Given a word, returns a list of all adjectives and other descriptors used to modify the counted object. Results are limited to lines which use a user-specified number system.",
+        "description": "",
+        "operationId": "modifiers_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "query",
+                "system"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The word to consider."
+                },
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "date",
+                    "cardinal",
+                    "length",
+                    "surface",
+                    "volume",
+                    "dry capacity",
+                    "liquid capacity",
+                    "weight",
+                    "bricks"
+                  ],
+                  "description": "The number system to use for filtering the results."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array listing adjectives and other descriptors which modify the search term, alongside a count specifying how many times this descriptor occurs with the search term.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "modifier": {
+                    "type": "string"
+                  },
+                  "count": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/similar": {
+      "post": {
+        "tags": ["visualize"],
+        "summary": "Given a word, returns a list of similar words and a summary of how these words' distributions differ from the distribution of the input word.",
+        "description": "",
+        "operationId": "similar_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "query",
+                "system"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The word to consider."
+                },
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "date",
+                    "cardinal",
+                    "length",
+                    "surface",
+                    "volume",
+                    "dry capacity",
+                    "liquid capacity",
+                    "weight",
+                    "bricks"
+                  ],
+                  "description": "The number system to use for filtering the results."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array listing words with similar distributions to the search term. The five most similar terms are returned in order of decreasing similarity. ",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "word": {
+                    "type": "string"
+                  },
+                  "divergence": {
+                    "type": "string",
+                    "description": "KL divergence between this term\\'s distribution and the search term\\'s distribution"
+                  },
+                  "distribution": {
+                    "type": "array",
+                    "description": "Array describing a simple histogram of this item\\'s distribution, limited to the domain of the search term\\'s histogram for ease of comparison.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "index": {
+                          "type": "number",
+                          "description": "Index of this bin."
+                        },
+                        "value": {
+                          "type": "number",
+                          "description": "Percent of counts which occur in this bin."
+                        },
+                        "label": {
+                          "type": "string",
+                          "description": "Human-readable label for this bar of the histogram."
+                        },
+                        "bin": {
+                          "type": "string",
+                          "description": "Human-readable label showing the range this bin encompasses."
+                        }
+                      }
+                    }
+                  },
+                  "delta": {
+                    "type": "array",
+                    "description": "Array describing how this item\\'s distribution differs from that of the search term, limited to the domain of the search term\\'s histogram for ease of comparison.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "index": {
+                          "type": "number",
+                          "description": "Index of this bin."
+                        },
+                        "value": {
+                          "type": "number",
+                          "description": "Difference between the number of counts which occur in this bin and the number of counts which occured in this bin for the search term. Expressed as a percentage."
+                        },
+                        "label": {
+                          "type": "string",
+                          "description": "Human-readable label for this bar of the histogram."
+                        },
+                        "bin": {
+                          "type": "string",
+                          "description": "Human-readable label showing the range this bin encompasses."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commodities.json": {
+      "get": {
+        "tags": [
+          "static files"
+        ],
+        "summary": "Return a (precomputed) JSON object listing information about the corpus. Computing this for the whole corpus is too slow to do on the fly, so this is served from a static, precomputed JSON file.",
+        "description": "",
+        "operationId": "coms_get",
+        "consumes": [],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Precomputed data describing the commodities and numerals in the corpus."
+          }
+        }
+      }
+    },
+    "/swagger.json": {
+      "get": {
+        "tags": [
+          "static files"
+        ],
+        "summary": "Return this API specification.",
+        "description": "",
+        "operationId": "spec_get",
+        "consumes": [],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "This API specification."
+          }
+        }
+      }
+    },
+    "/convert": {
+      "post": {
+        "tags": [
+          "convert"
+        ],
+        "summary": "Convert a Sumerian numeral to Arabic notation",
+        "description": "",
+        "operationId": "convert_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "query",
+                "language"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The string to convert"
+                },
+                "language": {
+                  "type": "string",
+                  "enum": [
+                    "sux"
+                  ],
+                  "description": "The language the number comes from. Current version only supports Sumerian."
+                },
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "date",
+                    "cardinal",
+                    "length",
+                    "surface",
+                    "volume",
+                    "dry capacity",
+                    "liquid capacity",
+                    "weight",
+                    "bricks"
+                  ],
+                  "description": "The number system to use for conversion. If none is supplied, a list of all possible conversions is returned."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Converted successfully. Returns a list of possible readings:",
+            "schema": {
+              "properties": {
+                "readings": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Reading"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid parameter, or request is not of type application/json."
+          }
+        }
+      }
+    },
+    "/canParse": {
+      "post": {
+        "tags": [
+          "canparse"
+        ],
+        "summary": "Determine whether a string can be parsed as a numeral",
+        "description": "",
+        "operationId": "canparse_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "query",
+                "language"
+              ],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The string to evaluate"
+                },
+                "language": {
+                  "type": "string",
+                  "enum": [
+                    "sux"
+                  ],
+                  "description": "The language the number comes from. Current version only supports Sumerian."
+                },
+                "greedy": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Specifies whether to greedily parse missing signs. If true, broken and missing signs will be ignored, so e.g. '1(u) ... sze' will be considered a valid number."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Converted successfully. Returns a list of systems that can parse the query string:",
+            "schema": {
+              "properties": {
+                "result": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/ParseResult"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid parameter, or request is not of type application/json."
+          }
+        }
+      }
+    },
+    "/commodify": {
+      "post": {
+        "tags": [
+          "commodify"
+        ],
+        "summary": "Get commodity information about a group of texts",
+        "description": "",
+        "operationId": "commodify_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object. Either cdli_no or text is required, but not both:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "cdli_nos": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+		  },
+                  "description": "Array of CDLI numbers to analyse for commodities, e.g. [\"P100839\", \"P100840\"]"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a list of entries in the input text, with readings supplied for the numbers and counted objects annotated with '_COM':",
+            "schema": {
+              "$ref": "#/definitions/CommodifyResult"
+            }
+          },
+          "400": {
+            "description": "Missing or invalid parameter, or request is not of type application/json."
+          }
+        }
+      }
+    },
+    "/commodifyOne": {
+      "post": {
+        "tags": [
+          "commodify"
+        ],
+        "summary": "Get commodity information about a single text",
+        "description": "",
+        "operationId": "commodify_one_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object. Either cdli_no or text is required, but not both:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "cdli_no": {
+                  "type": "string",
+                  "description": "The CDLI number of a document to analyse for commodities, e.g. P100839"
+                },
+                "text": {
+                  "type": "string",
+                  "description": "A string to analyse for commodities"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a list of entries in the input text, with readings supplied for the numbers and counted objects annotated with '_COM':",
+            "schema": {
+              "$ref": "#/definitions/CommodifyResult"
+            }
+          },
+          "400": {
+            "description": "Missing or invalid parameter, or request is not of type application/json."
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Graph": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "group": {
+                "type": "number"
+              },
+              "freq": {
+                "type": "number"
+              },
+              "defs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "count": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "StatsResult": {
+      "type": "object",
+      "properties": {
+        "statistic": {
+          "type": "string",
+          "enum": [
+            "n-instances",
+            "sum",
+            "sum-unit",
+            "mean",
+            "variance",
+            "stdev",
+            "skewness",
+            "kurtosis",
+            "gmean",
+            "hmean",
+            "median",
+            "mode"
+          ]
+        },
+        "value": {
+          "type": "number"
+        }
+      }
+    },
+    "ParseResult": {
+      "type": "object",
+      "properties": {
+        "system": {
+          "type": "string",
+          "enum": [
+            "date",
+            "cardinal",
+            "length",
+            "surface",
+            "volume",
+            "dry capacity",
+            "liquid capacity",
+            "weight",
+            "bricks"
+          ]
+        },
+        "canparse": {
+          "type": "boolean"
+        }
+      }
+    },
+    "NumberSystemsResult": {
+      "type": "array",
+      "items": {
+        "type": "object",
+	"properties": {
+          "system": {
+            "type": "string",
+	    "enum": [
+              "date",
+              "cardinal",
+              "length",
+              "surface",
+              "volume",
+              "dry capacity",
+              "liquid capacity",
+              "weight",
+              "bricks"
+            ],
+            "description": "Name of a number system which is used with the query term."
+          }
+        }
+      }
+    },
+    "CommodifyAllResult": {
+      "type": "object",
+      "properties": {
+        "TODO": {
+          "type": "string",
+          "description": "This endpoint is being refactored, and its output format will change."
+        }
+      }
+    },
+    "Reading": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "system": {
+          "type": "string",
+          "enum": [
+            "date",
+            "cardinal",
+            "length",
+            "surface",
+            "volume",
+            "dry capacity",
+            "liquid capacity",
+            "weight",
+            "bricks"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "",
+            "gi",
+            "gin2",
+            "sila3"
+          ]
+        },
+        "modern_value": {
+          "type": "number"
+        },
+        "modern_unit": {
+          "type": "string",
+          "enum": [
+            "",
+            "m",
+            "m^2",
+            "l",
+            "g",
+            "bricks"
+          ]
+        }
+      },
+      "xml": {
+        "name": "Order"
+      }
+    },
+    "CommodifyResult": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Entry"
+          }
+        }
+      }
+    },
+    "Entry": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "object",
+          "properties": {
+            "string": {
+              "type": "string"
+            },
+            "readings": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Reading"
+              }
+            }
+          }
+        },
+        "words": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

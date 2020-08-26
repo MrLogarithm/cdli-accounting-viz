@@ -1,0 +1,11 @@
+# node image so we can npm install
+FROM node:12-alpine
+
+WORKDIR /usr/src/app
+
+COPY ./code/site ./
+
+RUN npm install
+
+EXPOSE 80
+CMD [ "node", "server.js" ]

@@ -1,0 +1,25 @@
+# version number of docker-compose file
+version: '3'
+
+# list of provided services
+services:
+
+  # API endpoint for numeral conversion and 
+  # commodity information
+  viz-api:
+    build:
+      context: .
+      dockerfile: Dockerfile-flask
+    ports:
+      - 8088:8088
+    # run flask in development mode
+    environment:
+      - FLASK_ENV= development
+
+  # http server to display visualizations
+  viz-site:
+    build:
+      context: .
+      dockerfile: Dockerfile-node
+    ports:
+      - 4001:80

@@ -1,0 +1,20 @@
+# host and port where the api will run
+# this should match the port mapping in
+# docker-compose-org.yml
+# and in ./code/assets/js/init.js
+# this is a port on the container itself
+api:
+  port: 8088
+  host: 0.0.0.0
+  static_data_timeout: 3600
+# where to access the swagger documentation
+# this is a port on the *host* machine
+swagger:
+  port: 8087
+  host: 127.0.0.1
+db:
+  user: root
+  password: ''
+  host: mariadb
+  port: 3306
+  database: cdli_db
