@@ -36,7 +36,7 @@ RUN rm -rf /cdli-commodity-viz/code/site*
 
 # Extract compressed data:
 WORKDIR /cdli-commodity-viz/code/data/
-RUN tar xvf commodities.tar.gz
+RUN tar xf commodities.tar.gz
 RUN rm commodities.tar.gz
 
 # Run flask in code directory
