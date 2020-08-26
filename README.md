@@ -41,7 +41,7 @@ python3 generate.py
 Ensure that the framework's `mariadb` container is running at the same time, as this script requires database access.
 
 ## User Guide
-Available [here](https://gitlab.com/cdli/framework/-/blob/phoenix/feature/commodities/app/tools/commodity-viz/docs/UserGuide.md).
+Available [here](https://github.com/MrLogarithm/cdli-accounting-viz/blob/master/docs/UserGuide.md).
 
 ## API Documentation
 When the application is running, access the documentation at http://127.0.0.1:8087/docs/

@@ -2,7 +2,7 @@
 ## User Guide
 
 # 1. Introduction
-This is the user guide for the commodity visualizations in `framework/app/tools/commodity-viz/`. Technical documentation is available [here](https://gitlab.com/cdli/framework/-/blob/phoenix/feature/commodities/app/tools/commodity-viz/README.md).
+This is the user guide for the commodity visualizations in `framework/app/tools/commodity-viz/`. Technical documentation and install instructions are available [here](https://github.com/MrLogarithm/cdli-accounting-viz/blob/master/README.md).
 
 These visualizations are intended to help users explore how various goods are represented in the ancient economy. Using these tools, users are able to discover how frequently a given item is recorded in ancient accounting texts, how often groups of items occur together, what varieties or subtypes of an item have been recorded, and more.
 
@@ -20,7 +20,7 @@ It is also possible to specify a corpus using the `corpus` URL parameter. For ex
 ## 3.1. Searching and Filtering
 Type a Sumerian word into the search bar and press Enter to focus that word in the visualization. As you type, an autocomplete menu will show words matching what you have entered so far. Our data combines information from multiple transliterators as well as the ePSD, so some words may be attested with multiple spellings. If your search term does not seem to exist, consult the autocomplete suggestions to see if an alternate spelling has been used.
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/autocomplete.gif' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/autocomplete.gif' />
 
 Once you enter a search term, the radio buttons beside the search bar will show the different number systems used to count that object. Click the radio buttons to switch between different uses of your search term. Note that many Sumerian numeral notations are ambiguous, and could potentially belong to any of several counting systems. We have tried to disambiguate these cases, but there is the possibility that some counts may have been assigned to the wrong system.
 
@@ -29,15 +29,15 @@ Whenever a commodity word occurs on the page, you can click on it to refocus the
 ## 3.1. Histogram and Summary Statistics
 This module gives an overview of the numeric values associated with your search term. 
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/histogram-tooltip.gif' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/histogram-tooltip.gif' />
 
 The histogram shows the item's overall distribution. Hovering over a bar on the histogram will show a tooltip telling you exactly how often numbers in a certain range are used to count the search term. The slider to the side of the histogram lets you control the granularity of the figure.
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/histogram-slider.gif' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/histogram-slider.gif' />
 
 Immediately below the histogram, you will see how many entries in the corpus record your chosen item, and how many of the item are recorded in sum.
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/stats.jpg' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/stats.jpg' />
 
 The bottom part of this module summarizes basic statistics about the item's distribution, such as the average value, the most common value, and how much variation there is in the attested values.
 
@@ -46,7 +46,7 @@ The concordance module shows all of the entries in the corpus which contain your
 
 If you hover over a value in the Occurrences column, a tooltip will show which texts contain the associated line. Clicking on the value will open a CDLI search result showing these texts in transliteration.
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/concordance-tooltip.gif' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/concordance-tooltip.gif' />
 
 You can type into the Filter bar at the top of the Concordance module to search for lines which contain a certain word or phrase.
 
@@ -54,7 +54,7 @@ You can type into the Filter bar at the top of the Concordance module to search 
 ### 3.3.1. Table View
 This table lists the other counted objects which occur in documents containing your search term. In each row, the first column shows a counted object, and the second column counts how many texts contain both that object and your search term. 
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/nearby-tooltip.gif' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/nearby-tooltip.gif' />
 
 Hovering over a value in the Occurrences column will list the texts that contain both words, and clicking on the value will take you to a CDLI search containing those texts. As in the Concordance module, you can use the Filter bar to search for rows containing a particular word.
 
@@ -65,12 +65,12 @@ Each node in the graph is an item which occurs in texts containing your search t
 
 Strongly connected components tend to represent different "genres" of text that your item can occur in. Sometimes, these components can be easily seen, as in the figure below which has two distinct clouds of items. 
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/connected-components.jpg' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/connected-components.jpg' />
 
 If the figure is dense and connected components are hard to identify, clicking the "Highlight Cliques" button will make them light up when you hover your mouse over the graph.
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/clique-1.gif' />
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/clique-2.gif' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/clique-1.gif' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/clique-2.gif' />
 
 The sliders in the corner of the figure control how many items are displayed. The top slider controls how rare a word can be before it is pruned from the figure: at the left extreme, only the most common items are included in the figure, and at the right extreme all words are included. The second slider controls how many connections are included. At the left extreme, nodes are only connected if they occur together frequently. At the right extreme nodes may be connected even if they only occur in a single text together. Nodes with no connected edges are pruned from the figure, so this slider will adjust the overall number of nodes and not just the edge density.
 
@@ -85,27 +85,27 @@ The graph view shows which descriptors can be used together. Each node is a desc
 
 For example, the figure below shows modifiers associated with *masz* "goat". We see that goats are sometimes described as both "babbar2" and "bar-dul5" (white and used for garment production), and sometimes as "gu7" and "sze" (fed a diet of barley). But there is no link between "sze" and "bar-dul5", implying that when an animal was used for garment production its diet was not recorded.
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/descriptors.jpg' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/descriptors.jpg' />
 
 Consult the section on the Nearby Items graph view for an explanation of the figure parameters. 
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/descriptors-slider.gif' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/descriptors-slider.gif' />
 
 
 ## 3.5. Similar Items
 This module displays items which have a similar distribution to your search term. There are two views: in the reduced view, the histogram displays the difference between your search term's distribution and the distribution of other counted objects. The height of the bar shows how much more or less frequently a given range of values occur with the listed item than with your search term. If all of the bars are short, the items have nearly identical distributions. Pay careful attention to the scale of the vertical axis: bars that look tall may represent small differences. You can hover over a bar to see a tooltip giving the exact difference.
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/similar-reduced-tooltip.gif' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/similar-reduced-tooltip.gif' />
 
 Click the toggle in the corner of the module to switch to the full view. In this view, the object's full distribution is shown as a histogram, which may be compared to the Histogram module described above. 
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/similar-full.gif' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/similar-full.gif' />
 
 ## 3.6. Other
 
 In the top left corner you will find the Help, Random Word, and Cite buttons. 
 
-<img src='https://gitlab.com/cdli/framework/-/raw/phoenix/feature/commodities/app/tools/commodity-viz/docs/img/other-buttons.jpg' />
+<img src='https://raw.githubusercontent.com/MrLogarithm/cdli-accounting-viz/master/docs/img/other-buttons.jpg' />
 
 The Help button will reopen the welcome modal which describes the page and links to this guide.
 
