@@ -369,7 +369,7 @@ $('#help-button').click(function(){
 	<span class="text-center help" style='line-height:20px;' id='none'>
 	  ?
 	</span>
-	to see an explanation for each module, or access the full user guide <a href='https://gitlab.com/cdli/framework/-/blob/phoenix/feature/commodities/app/tools/commodity-viz/docs/UserGuide.md'>here</a>.
+	to see an explanation for each module, or access the full user guide <a href='https://github.com/MrLogarithm/cdli-accounting-viz/blob/master/docs/UserGuide.md'>here</a>.
 	</p>
 
 	<p class='text-center'>
