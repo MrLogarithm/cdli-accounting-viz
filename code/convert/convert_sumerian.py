@@ -47,7 +47,7 @@ Cardinal = NumberSystem(
 Length = NumberSystem(
     "length",
     {
-        "asz": 1, # TODO verify
+    "asz": 1,
     # NUMERALS
     "disz": 1,
     "u":    10,
@@ -107,7 +107,7 @@ Surface = NumberSystem(
 Volume = NumberSystem(
     "volume",
     {
-        "asz":1, # TODO verify
+        "asz":1, 
         "disz": 1,
         "u":    10,
         "gesz2": 60,
@@ -143,8 +143,8 @@ DryCapacity = NumberSystem(
         "sze":1./10800,
         "gin2":1./60,
         "sila3":1,
-        ("ban2", 'gur'):10, # 10 times sila3 # TODO the /300 is a hack to make this work
-        ("ban2", None):10, # 10 times sila3 # TODO the /300 is a hack to make this work
+        ("ban2", 'gur'):10, # 10 times sila3 
+        ("ban2", None):10, # 10 times sila3 
         # when we see 1(ban2) we are out of the sila3 regime, so we advance to gur
         # in expectation of an eventual 1(asz). but we don't incorporate the value
         # of gur into 1(ban2), so we divide by 1 gur to counteract 
@@ -179,7 +179,7 @@ DryCapacity = NumberSystem(
 LiquidCapacity = NumberSystem(
     "liquid capacity",
     {
-        "asz":1, # TODO verify
+        "asz":1, 
         "disz": 1, # UNIT #
         "u":    10,
         "gesz2": 60,
@@ -208,7 +208,7 @@ Weight = NumberSystem(
         "szar2": 3600,
         "szar'u": 36000,
         "szargal": 216000,
-        ("|ninda2x(sze.1(asz))|",None):1, # TODO test
+        ("|ninda2x(sze.1(asz))|",None):1, 
         #
         "sze":1./180,
         "gin2":1,
@@ -222,7 +222,7 @@ Weight = NumberSystem(
 Brick = NumberSystem(
     "bricks",
     {
-        "asz":1, # TODO verify
+        "asz":1, # 
         "disz": 1, # UNIT #
         "u":    10,
         "gesz2": 60,
