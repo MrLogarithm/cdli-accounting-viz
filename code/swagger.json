@@ -30,29 +30,6 @@
     }
   ],
   "paths": {
-    "/commodifyAll": {
-      "post": {
-        "tags": [
-          "commodify"
-        ],
-        "summary": "Returns all extracted information about commodities and numbers in a corpus.",
-        "description": "",
-        "operationId": "commodify_all_post",
-        "consumes": [],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Returns a JSON object listing all of the commodity information extracted from the corpus.",
-            "schema": {
-              "$ref": "#/definitions/CommodifyAllResult"
-            }
-          }
-        }
-      }
-    },
     "/getNumberSystems": {
       "post": {
         "tags": ["visualize"],
@@ -74,13 +51,18 @@
             "schema": {
               "type": "object",
               "required": [
-                "query"
+                "query",
+		"corpus"
               ],
               "properties": {
                 "query": {
                   "type": "string",
-                  "description": "The word to consider."
-                }
+                  "description": "The word to get information about."
+                },
+		"corpus": {
+		  "type": "string",
+		  "description": "Representation of the corpus to get data from. Can be a space or comma-delimited list of P-numbers, or an encoded representation of such a list. See site/assets/js/urlparams.js for details about how to perform the encoding."
+		}
               }
             }
           }
@@ -117,7 +99,8 @@
               "type": "object",
               "required": [
                 "query",
-                "system"
+                "system",
+		"corpus"
               ],
               "properties": {
                 "query": {
@@ -138,6 +121,10 @@
                     "bricks"
                   ],
                   "description": "The number system to describe. Counts which are not written in this system will be excluded when computing the statistics."
+                },
+                "corpus": {
+                  "type": "string",
+		  "description": "Representation of the corpus to get data from. Can be a space or comma-delimited list of P-numbers, or an encoded representation of such a list. See site/assets/js/urlparams.js for details about how to perform the encoding."
                 }
               }
             }
@@ -151,6 +138,48 @@
               "items": {
                 "$ref": "#/definitions/StatsResult"
               }
+            }
+          }
+        }
+      }
+    },
+    "/dictionary": {
+      "post": {
+        "tags": ["visualize"],
+        "summary": "Returns a list of all the commodities found ins the specified corpus, and a dictionary of meanings for those words.",
+        "description": "",
+        "operationId": "dictionary_post",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "json",
+            "description": "Request body should be a JSON object:",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+		"corpus"
+              ],
+              "properties": {
+		"corpus": {
+		  "type": "string",
+		  "description": "Representation of the corpus to get data from. Can be a space or comma-delimited list of P-numbers, or an encoded representation of such a list. See site/assets/js/urlparams.js for details about how to perform the encoding."
+		}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An object containing a list of words found in the corpus and a dictionary of definitions for those words.",
+            "schema": {
+              "$ref": "#/definitions/Dictionary"
             }
           }
         }
@@ -177,13 +206,34 @@
             "schema": {
               "type": "object",
               "required": [
-                "query"
+                "query",
+		"system",
+		"corpus"
               ],
               "properties": {
                 "query": {
                   "type": "string",
                   "description": "The word to consider."
-                }
+                },
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "date",
+                    "cardinal",
+                    "length",
+                    "surface",
+                    "volume",
+                    "dry capacity",
+                    "liquid capacity",
+                    "weight",
+                    "bricks"
+                  ],
+                  "description": "Limit results to entries that use the specified number system."
+                },
+		"corpus": {
+		  "type": "string",
+		  "description": "Representation of the corpus to get data from. Can be a space or comma-delimited list of P-numbers, or an encoded representation of such a list. See site/assets/js/urlparams.js for details about how to perform the encoding."
+		}
               }
             }
           }
@@ -230,12 +280,33 @@
             "schema": {
               "type": "object",
               "required": [
-                "query"
+                "query",
+		"system",
+		"corpus"
               ],
               "properties": {
                 "query": {
                   "type": "string",
                   "description": "The word to consider."
+                },
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "date",
+                    "cardinal",
+                    "length",
+                    "surface",
+                    "volume",
+                    "dry capacity",
+                    "liquid capacity",
+                    "weight",
+                    "bricks"
+                  ],
+                  "description": "Limit results to entries that use the specified number system."
+                },
+                "corpus": {
+                  "type": "string",
+		  "description": "Representation of the corpus to get data from. Can be a space or comma-delimited list of P-numbers, or an encoded representation of such a list. See site/assets/js/urlparams.js for details about how to perform the encoding."
                 }
               }
             }
@@ -272,13 +343,34 @@
             "schema": {
               "type": "object",
               "required": [
-                "query"
+                "query",
+		"system",
+		"corpus"
               ],
               "properties": {
                 "query": {
                   "type": "string",
                   "description": "The word to consider."
-                }
+                },
+                "system": {
+                  "type": "string",
+                  "enum": [
+                    "date",
+                    "cardinal",
+                    "length",
+                    "surface",
+                    "volume",
+                    "dry capacity",
+                    "liquid capacity",
+                    "weight",
+                    "bricks"
+                  ],
+                  "description": "Limit results to entries that use the specified number system."
+                },
+		"corpus": {
+		  "type": "string",
+		  "description": "Representation of the corpus to get data from. Can be a space or comma-delimited list of P-numbers, or an encoded representation of such a list. See site/assets/js/urlparams.js for details about how to perform the encoding."
+		}
               }
             }
           }
@@ -315,7 +407,8 @@
               "type": "object",
               "required": [
                 "query",
-		"system"
+		"system",
+		"corpus"
               ],
               "properties": {
                 "query": {
@@ -336,7 +429,11 @@
                     "bricks"
                   ],
                   "description": "The number system to use when evaluating the numerals."
-                }
+                },
+		"corpus": {
+		  "type": "string",
+		  "description": "Representation of the corpus to get data from. Can be a space or comma-delimited list of P-numbers, or an encoded representation of such a list. See site/assets/js/urlparams.js for details about how to perform the encoding."
+		}
               }
             }
           }
@@ -384,7 +481,8 @@
               "type": "object",
               "required": [
                 "query",
-                "system"
+                "system",
+		"corpus"
               ],
               "properties": {
                 "query": {
@@ -405,6 +503,10 @@
                     "bricks"
                   ],
                   "description": "The number system to use for filtering the results."
+                },
+                "corpus": {
+                  "type": "string",
+		  "description": "Representation of the corpus to get data from. Can be a space or comma-delimited list of P-numbers, or an encoded representation of such a list. See site/assets/js/urlparams.js for details about how to perform the encoding."
                 }
               }
             }
@@ -456,7 +558,8 @@
               "type": "object",
               "required": [
                 "query",
-                "system"
+                "system",
+		"corpus"
               ],
               "properties": {
                 "query": {
@@ -477,6 +580,10 @@
                     "bricks"
                   ],
                   "description": "The number system to use for filtering the results."
+                },
+                "corpus": {
+                  "type": "string",
+		  "description": "Representation of the corpus to get or process data from. Can be a space or comma-delimited list of P-numbers, or an encoded representation of such a list. See site/assets/js/urlparams.js for details about how to perform the encoding."
                 }
               }
             }
@@ -525,7 +632,8 @@
               "type": "object",
               "required": [
                 "query",
-                "system"
+                "system",
+		"corpus"
               ],
               "properties": {
                 "query": {
@@ -546,6 +654,10 @@
                     "bricks"
                   ],
                   "description": "The number system to use for filtering the results."
+                },
+                "corpus": {
+                  "type": "string",
+		  "description": "Representation of the corpus to get data from. Can be a space or comma-delimited list of P-numbers, or an encoded representation of such a list. See site/assets/js/urlparams.js for details about how to perform the encoding."
                 }
               }
             }
@@ -619,25 +731,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/commodities.json": {
-      "get": {
-        "tags": [
-          "static files"
-        ],
-        "summary": "Return a (precomputed) JSON object listing information about the corpus. Computing this for the whole corpus is too slow to do on the fly, so this is served from a static, precomputed JSON file.",
-        "description": "",
-        "operationId": "coms_get",
-        "consumes": [],
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "Precomputed data describing the commodities and numerals in the corpus."
           }
         }
       }
@@ -810,7 +903,7 @@
         "tags": [
           "commodify"
         ],
-        "summary": "Get commodity information about a group of texts",
+        "summary": "Get or generate commodity information about a group of texts. Data is loaded from a file if one exists; else the API fetches ATF from the CDLI database, processes the text, and returns the processed data.",
         "description": "",
         "operationId": "commodify_post",
         "consumes": [
@@ -823,17 +916,14 @@
           {
             "in": "body",
             "name": "json",
-            "description": "Request body should be a JSON object. Either cdli_no or text is required, but not both:",
+            "description": "Request body should be a JSON object.",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "cdli_nos": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-		  },
-                  "description": "Array of CDLI numbers to analyse for commodities, e.g. [\"P100839\", \"P100840\"]"
+                "corpus": {
+                  "type": "string",
+		  "description": "Representation of the corpus to get or process data from. Can be a space or comma-delimited list of P-numbers, or an encoded representation of such a list. See site/assets/js/urlparams.js for details about how to perform the encoding."
                 }
               }
             }
@@ -841,55 +931,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Returns a list of entries in the input text, with readings supplied for the numbers and counted objects annotated with '_COM':",
-            "schema": {
-              "$ref": "#/definitions/CommodifyResult"
-            }
-          },
-          "400": {
-            "description": "Missing or invalid parameter, or request is not of type application/json."
-          }
-        }
-      }
-    },
-    "/commodifyOne": {
-      "post": {
-        "tags": [
-          "commodify"
-        ],
-        "summary": "Get commodity information about a single text",
-        "description": "",
-        "operationId": "commodify_one_post",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "json",
-            "description": "Request body should be a JSON object. Either cdli_no or text is required, but not both:",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "cdli_no": {
-                  "type": "string",
-                  "description": "The CDLI number of a document to analyse for commodities, e.g. P100839"
-                },
-                "text": {
-                  "type": "string",
-                  "description": "A string to analyse for commodities"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Returns a list of entries in the input text, with readings supplied for the numbers and counted objects annotated with '_COM':",
+            "description": "Returns a list with one item per input text. Each entry summarizes the numeric and commodity data of the corresponding text.",
             "schema": {
               "$ref": "#/definitions/CommodifyResult"
             }
@@ -1017,15 +1059,6 @@
         }
       }
     },
-    "CommodifyAllResult": {
-      "type": "object",
-      "properties": {
-        "TODO": {
-          "type": "string",
-          "description": "This endpoint is being refactored, and its output format will change."
-        }
-      }
-    },
     "Reading": {
       "type": "object",
       "properties": {
@@ -1083,9 +1116,163 @@
         "entries": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Entry"
+            "$ref": "#/definitions/CommodifiedText"
           }
         }
+      }
+    },
+    "CommodifiedText": {
+      "type": "object",
+      "properties": {
+	"counts_by_commodity": {
+	  "type": "object",
+	  "properties": {
+	    "commodity": {
+	      "type": "object",
+	      "properties": {
+		"number": {
+		  "type": "integer",
+		  "description": "The number of times this number is used to count the parent commodity."
+		}
+	      },
+	      "description": "Keys are dynamic. Each key (\"number\" in the schema) is a number in Sumerian notation."
+	    }
+	  },
+	  "description": "Keys are dynamic. Each key (\"commodity\" in the schema) is an object from all_objects."
+	},
+	"counts_by_modified_commodity": {
+	  "type": "object",
+	  "properties": {
+	    "commodity": {
+	      "type": "object",
+	      "properties": {
+		"number": {
+		  "type": "integer",
+		  "description": "The number of times this number is used to count the parent commodity."
+		}
+	      },
+	      "description": "Keys are dynamic. Each key (\"number\" in the schema) is a number in Sumerian notation."
+	    }
+	  },
+	  "description": "Keys are dynamic. Each key (\"commodity\" in the schema) is a string of objects and descriptors."
+	},
+	"values_by_commodity": {
+	  "type": "object",
+	  "properties": {
+	    "commodity": {
+	      "type": "array",
+	      "items": {
+		"type": "array",
+		"items": {
+                  "$ref": "#/definitions/Reading"
+		}
+	      },
+	      "description": "Array listing all possible readings of all the numbers used to count this item."
+	    }
+	  },
+	  "description": "Keys are dynamic. Each key (\"commodity\" in the schema) is an object from all_objects."
+	},
+	"values_by_modified_commodity": {
+	  "type": "object",
+	  "properties": {
+	    "commodity": {
+	      "type": "array",
+	      "items": {
+		"type": "array",
+		"items": {
+                  "$ref": "#/definitions/Reading"
+		}
+	      },
+	      "description": "Array listing all possible readings of all the numbers used to count this item."
+	    }
+	  },
+	  "description": "Keys are dynamic. Each key (\"commodity\" in the schema) is a string of objects and descriptors."
+	},
+	"collocation_counts": {
+	  "type": "object",
+	  "properties": {
+	    "pair": {
+	      "type": "integer",
+	      "description": "Counts how many times a pair of words co-occur in this text. (Each pair is counted separately, so a text with two instances of A and two of B will have 4 instances of the pair A-B)"
+	    }
+	  },
+	  "description": "Keys are dynamic. Each key (\"pair\" in the schema) is a pair of words from all_objects."
+	},
+	"all_objects": {
+	  "type": "array",
+	  "items": "string",
+	  "description": "Array of all the counted objects in this text."
+	},
+	"line_counts": {
+	  "type": "object",
+	  "properties": {
+	    "line": {
+	      "type": "integer",
+	      "description": "Counts how many times this line occurs."
+	    }
+	  },
+	  "description": "Keys are dynamic. Each key (\"line\" in the schema) is a line from the text."
+	},
+	"line_sources": {
+	  "type": "object",
+	  "properties": {
+	    "line": {
+	      "type": "array",
+	      "items": { "type": "string" },
+	      "description": "List of texts that contain this line."
+	    }
+	  },
+	  "description": "Keys are dynamic. Each key (\"line\" in the schema) is a line from the text."
+	},
+	"line_data": {
+	  "type": "object",
+	  "properties": {
+	    "line": {
+	      "type": "object",
+	      "properties": {
+		"counted": {
+		  "type": "array",
+		  "items": { "type": "string" },
+		  "description": "Array listing all counted objects in this line."
+		},
+		"value": {
+		  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Reading"
+                  },
+		  "description": "Array listing the possible readings for the numbers in this line."
+		},
+		"modifiers": {
+		  "type": "array",
+		  "items": {
+		    "type": "string"
+		  },
+		  "description": "Array listing all of the adjectives and other modifiers that apply to the counted objects in this line."
+		}
+	      }
+	    }
+	  },
+	  "description": "Keys are dynamic. Each key (\"line\" in the schema) is a line from the text."
+	},
+	"cdli_no": {
+	  "type": "string",
+	  "description": "The P-number associated with this text."
+	}
+      }
+    },
+    "Dictionary": {
+      "type": "object",
+      "properties": {
+	"all_objects": {
+	  "type": "array",
+	  "items": {
+	    "type": "string"
+	  }
+	},
+	"dictionary": {
+	  "type": "object",
+	  "description": "Each key is a word found in all_objects. Values are arrays of string definitions."
+	}
       }
     },
     "Entry": {
