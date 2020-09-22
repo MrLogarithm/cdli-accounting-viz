@@ -2,9 +2,9 @@
 
 Utilities and visualizations for CDLI accounting corpora. Included are an API for retrieving information about numerals and counted objects, and a web interface which allows for exploratory visualization of this data. 
 
-## Installation
+## Framework Installation
 
-This project runs as part of the CDLI framework. Standalone installation is not supported, as access to the CDLI database is required for the project to work.
+By default, this project runs as part of the CDLI framework. See the next section for standalone installation instructions.
 
 1. Install the CDLI framework following [these instructions](https://gitlab.com/cdli/framework/-/blob/phoenix/develop/FRAMEWORK_INSTALL.md). Ensure you have a recent copy of the database, as this project fetches data from the `inscriptions` and `artifact_languages` tables.
 2. Ensure that this project is enabled in `framework/dev/config.json.dist`:
@@ -39,6 +39,21 @@ If the containers do not (re)build automatically, force them with
 python3 generate.py
 ```
 Ensure that the framework's `mariadb` container is running at the same time, as this script requires database access.
+
+## Standalone Installation
+
+1. Build the docker containers:
+```
+docker-compose build
+```
+2. Launch the containers, remapping some ports to match the behavior of the containers on the framework:
+```
+docker run --publish 8087:8088 --detach cdli-accounting-viz_viz-api
+docker run --publish 4001:80 --detach cdli-accounting-viz_viz-site
+```
+3. Access the visualization interface at 
+http://127.0.0.1:4001/cdli-accounting-viz/
+or access the API directly at 127.0.0.1:8087
 
 ## User Guide
 Available [here](https://github.com/MrLogarithm/cdli-accounting-viz/blob/master/docs/UserGuide.md).
